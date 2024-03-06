@@ -4,8 +4,8 @@ from PySide6 import QtWidgets, QtCore, QtGui
 class AnimatedPanel(QtWidgets.QFrame):
     is_opened: bool = False
     main_v_layout: QtWidgets.QVBoxLayout = None
-    animator_pos: QtCore.QPropertyAnimation = None
-    animator_size: QtCore.QPropertyAnimation = None
+    animation_pos: QtCore.QPropertyAnimation = None
+    animation_size: QtCore.QPropertyAnimation = None
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super(AnimatedPanel, self).__init__(parent)
         self.parent: QtWidgets.QMainWindow = parent
@@ -14,18 +14,16 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.hide()
     
     def __init_ui(self) -> None:
-        self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.main_v_layout = QtWidgets.QHBoxLayout()
         self.animation_size = QtCore.QPropertyAnimation(self, b'size')
         self.animation_pos = QtCore.QPropertyAnimation(self, b'pos')
-        self.label = QtWidgets.QLabel('Аля')
+        self.animation_size.setTargetObject(self)
+        self.animation_pos.setTargetObject(self)
     
     def __setting_ui(self) -> None:
-        self.setLayout(self.main_v_layout)
-        self.main_v_layout.addWidget(self.label)
         self.animation_size.setDuration(500)
         self.animation_pos.setDuration(500)
-        self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    
+        
     def start_animation(self) -> None:
         self.set_values_for_animation()
         self.animation_size.start()
@@ -44,6 +42,7 @@ class AnimatedPanel(QtWidgets.QFrame):
 
         self.show() if not self.is_opened \
             else self.animation_pos.finished.connect(self.hide_after_finished)
+        
         self.is_opened = not self.is_opened
     
     def hide_after_finished(self) -> None:

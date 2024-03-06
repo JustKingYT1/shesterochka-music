@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 import sys
-from animated_panel import AnimatedPanel
+from src.client.side_menu_widget import SideMenu
+from src.client.settings_widget import SettingsMenu
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -12,19 +13,22 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def __init_ui(self) -> None:
         self.central_widget = QtWidgets.QWidget()
-        self.main_h_layout = QtWidgets.QHBoxLayout()
-        self.animated_panel = AnimatedPanel(self)
-        self.button = QtWidgets.QPushButton()
+        self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.settings_menu = SettingsMenu(self)
+        self.side_menu = SideMenu(self)
 
     def __setting_ui(self) -> None:
         self.setCentralWidget(self.central_widget)
-        self.central_widget.setLayout(self.main_h_layout)
-        self.main_h_layout.addWidget(self.button)
-        self.button.setFixedSize(20, 20)
-        self.button.clicked.connect(self.__button_clicked)
+        self.central_widget.setLayout(self.main_v_layout)
+        self.resize(400, 500)
+        self.main_v_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignBottom)
+        self.main_v_layout.addWidget(self.side_menu)
+        self.side_menu.settings_button.clicked.connect(self.__button_clicked)
 
     def __button_clicked(self) -> None:
-        self.animated_panel.start_animation()
+        self.settings_menu.start_animation()
+        self.settings_menu.raise_()
         
 
 if __name__ == "__main__":
