@@ -3,8 +3,6 @@ import settings
 import pydantic
 import typing
 
-print(settings.DB_PATH)
-
 database = peewee.SqliteDatabase(settings.DB_PATH)
 
 
@@ -14,16 +12,16 @@ class BaseModel(peewee.Model):
 
 
 class UserModel(pydantic.BaseModel):
-    id: typing.Optional[int]
+    id: typing.Optional[int] = 0
     nickname: str
     password: str
-    image_path: typing.Optional[str]
+    image_path: typing.Optional[str] = ''
 
 
 class User(BaseModel):
     nickname = peewee.CharField(null=False, unique=True)
     password = peewee.CharField(null=False)
-    image_path = peewee.CharField()
+    image_path = peewee.CharField(null=True)
 
 
 class Music(BaseModel):

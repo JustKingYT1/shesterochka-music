@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.dialog_widgets.register_dialog_widget import RegisterDialog
+from src.client.dialog_widgets.login_dialog_widget import LoginDialog
 
 
 class SettingsMenu(AnimatedPanel):
@@ -17,6 +18,7 @@ class SettingsMenu(AnimatedPanel):
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
         self.user_profile_layout = QtWidgets.QVBoxLayout()
         self.register_dialog = RegisterDialog(self.parent)
+        self.login_dialog = LoginDialog(self.parent)
         self.user_nickname_label = QtWidgets.QLabel('Гость')
         self.user_image_label = QtWidgets.QLabel('Пользователь')
         self.log_in_button = QtWidgets.QPushButton('Войти')
@@ -33,17 +35,20 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextBrowserInteraction)
 
         self.register_label.linkActivated.connect(self.register_label_clicked)
+        self.exit_button.clicked.connect(self.exit_button_clicked)
+        self.log_in_button.clicked.connect(self.open_login_dialog)
         self.exit_button.hide()
 
         self.main_v_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
         self.user_profile_layout.addWidget(self.user_image_label)
+        
         self.user_profile_layout.addWidget(self.user_nickname_label)
 
         self.user_profile_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.main_v_layout.addLayout(self.user_profile_layout)
 
-        self.main_v_layout.addSpacing(100)
+        self.main_v_layout.addSpacing(120)
 
         self.authorize_v_layout.addWidget(self.log_in_button)
         self.authorize_v_layout.addWidget(self.register_label)
@@ -59,3 +64,27 @@ class SettingsMenu(AnimatedPanel):
         self.raise_()
         self.register_dialog.start_animation()
         self.register_dialog.raise_()
+    
+    def open_login_dialog(self) -> None:
+        self.start_animation()
+        self.raise_()
+        self.login_dialog.start_animation()
+        self.login_dialog.raise_()
+
+    def authorize_action(self) -> None:
+        self.user_nickname_label.setText(self.parent.session.user.nickname)
+        self.log_in_button.hide()
+        self.register_label.hide()
+        self.exit_button.show()
+        self.main_v_layout.addSpacing(90)
+
+    def exit_button_clicked(self) -> None:
+        self.exit_account()
+
+    def exit_account(self) -> None:
+        self.parent.session.leave()
+        self.user_nickname_label.setText(self.parent.session.user.nickname)
+        self.log_in_button.show()
+        self.register_label.show()
+        self.exit_button.hide()
+        self.main_v_layout.addSpacing(0)

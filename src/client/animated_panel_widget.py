@@ -42,6 +42,7 @@ class AnimatedPanel(QtWidgets.QFrame):
                                  start_value_size: QtCore.QPoint,
                                  end_value_size: QtCore.QPoint
                                  ) -> None:
+        
         self.animation_pos.setStartValue(start_value_pos if not self.is_opened \
                                                 else end_value_pos) 
         self.animation_pos.setEndValue(end_value_pos if not self.is_opened \
@@ -54,9 +55,9 @@ class AnimatedPanel(QtWidgets.QFrame):
 
         self.show() if not self.is_opened \
             else self.animation_pos.finished.connect(self.hide_after_finished)
-        
+
         self.is_opened = not self.is_opened
-    
+
     def hide_after_finished(self) -> None:
         self.animation_pos.finished.disconnect(self.hide_after_finished)
         self.hide()

@@ -81,12 +81,10 @@ class RegisterDialog(AnimatedPanel):
 
     def validate_text_line_edits(self) -> bool:
         if self.confirm_line_edit.text() != self.password_line_edit.text():
-            print(1)
             return False
         
         for x in (self.nickname_line_edit, self.password_line_edit, self.confirm_line_edit):
             if x.text() == '':
-                print(2)
                 return False
             
         return True
@@ -106,9 +104,12 @@ class RegisterDialog(AnimatedPanel):
         if self.parent.session.auth:
             self.parent.show_message(text='Succesfully register')
 
-        self.start_animation()
+        self.parent.settings_menu.authorize_action()
+
+        self.cancel_button_clicked()
     
     def cancel_button_clicked(self) -> None:
         self.start_animation()
         self.parent.settings_menu.start_animation()
+
 
