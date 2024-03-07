@@ -3,17 +3,18 @@ import settings
 import pydantic
 import typing
 
+print(settings.DB_PATH)
 
 database = peewee.SqliteDatabase(settings.DB_PATH)
 
 
 class BaseModel(peewee.Model):
     class Meta:
-        db = database
+        database = database
 
 
 class UserModel(pydantic.BaseModel):
-    id: int
+    id: typing.Optional[int]
     nickname: str
     password: str
     image_path: typing.Optional[str]
@@ -26,22 +27,21 @@ class User(BaseModel):
 
 
 class Music(BaseModel):
-    title = peewee.CharField(null=False)
-    artist = peewee.CharField(null=False)
+    title = peewee.CharField()
+    artist = peewee.CharField()
 
     class Meta:
-        db = database
-        indexes = (('artist', 'title'), True)
+        database = database
+        indexes = ((('title', 'artist'), True),)
 
 
 class UserPlaylists(BaseModel):
     user_id = peewee.ForeignKeyField(User, backref='Playlists', null=False)
     music_id = peewee.ForeignKeyField(Music, backref='Playlists', null=False)
 
-    class Meta:
-        db = database
-        indexes = (('user_id', 'music_id'), True)
+    class Meta:  
+        database = database
+        indexes = ((('user_id', 'music_id'), True),)
     
-
 
 database.create_tables([User, Music, UserPlaylists])

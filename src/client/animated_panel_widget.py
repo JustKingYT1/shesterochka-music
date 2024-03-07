@@ -24,21 +24,33 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.animation_size.setDuration(500)
         self.animation_pos.setDuration(500)
         
-    def start_animation(self) -> None:
-        self.set_values_for_animation()
+    def start_animation(self, 
+                        start_value_pos: QtCore.QPoint = None, 
+                        end_value_pos: QtCore.QPoint = None,
+                        start_value_size: QtCore.QPoint = None,
+                        end_value_size: QtCore.QPoint = None) -> None:
+        self.set_values_for_animation(start_value_pos if start_value_pos else QtCore.QPoint(10, self.parent.height() - 70),
+                                      end_value_pos if end_value_pos else QtCore.QPoint(10, 10),
+                                      start_value_size if start_value_size else QtCore.QSize(self.parent.width() - 20, 0),
+                                      end_value_size if end_value_size else QtCore.QSize(self.parent.width() - 20, self.parent.height() - 70))
         self.animation_size.start()
         self.animation_pos.start()
 
-    def set_values_for_animation(self) -> None:
-        self.animation_pos.setStartValue(QtCore.QPoint(10, self.parent.height() - 70) if not self.is_opened \
-                                                else QtCore.QPoint(10, 10)) 
-        self.animation_pos.setEndValue(QtCore.QPoint(10, 10) if not self.is_opened \
-                                                else QtCore.QPoint(10, self.parent.height() - 70))
+    def set_values_for_animation(self, 
+                                 start_value_pos: QtCore.QPoint, 
+                                 end_value_pos: QtCore.QPoint,
+                                 start_value_size: QtCore.QPoint,
+                                 end_value_size: QtCore.QPoint
+                                 ) -> None:
+        self.animation_pos.setStartValue(start_value_pos if not self.is_opened \
+                                                else end_value_pos) 
+        self.animation_pos.setEndValue(end_value_pos if not self.is_opened \
+                                                else start_value_pos)
         
-        self.animation_size.setStartValue(QtCore.QSize(self.parent.width() - 20, 0) if not self.is_opened \
-                                                        else QtCore.QSize(self.parent.width() - 20, self.parent.height() - 70))
-        self.animation_size.setEndValue(QtCore.QSize(self.parent.width() - 20, self.parent.height() - 70) if not self.is_opened \
-                                                        else QtCore.QSize(self.parent.width() - 20, 0))
+        self.animation_size.setStartValue(start_value_size if not self.is_opened \
+                                                        else end_value_size)
+        self.animation_size.setEndValue(end_value_size if not self.is_opened \
+                                                        else start_value_size)
 
         self.show() if not self.is_opened \
             else self.animation_pos.finished.connect(self.hide_after_finished)

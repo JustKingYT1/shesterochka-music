@@ -10,7 +10,7 @@ MAIN_DIR = os.path.abspath(os.path.join(os.path.dirname(sys.executable), os.pard
 
 # Database settings
 
-DB_PATH = f'{MAIN_DIR}/resources/shesterochkaPlayer.db'
+DB_PATH = f'{MAIN_DIR}\\resources\\shesterochkaPlayer.db'
 
 # Client settings
 
