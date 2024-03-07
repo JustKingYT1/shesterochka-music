@@ -23,6 +23,8 @@ class AnimatedPanel(QtWidgets.QFrame):
     def __setting_ui(self) -> None:
         self.animation_size.setDuration(500)
         self.animation_pos.setDuration(500)
+
+        self.setStyleSheet("AnimatedPanel { background-color: rgba(255, 255, 255, 128); }")
         
     def start_animation(self, 
                         start_value_pos: QtCore.QPoint = None, 

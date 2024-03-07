@@ -17,12 +17,10 @@ class Session:
                     nickname=user.nickname,
                     password=user.password,
                 )
-        except peewee.IntegrityError as ex:
+        except peewee.IntegrityError:
             self.parent.show_message(text='Такое имя уже занято, попробуйте ввести другое', 
                                      error=True, 
                                      parent=self.parent)
-            
-            print(str(ex))
             return
         
         new_user = User.get(nickname=user.nickname)

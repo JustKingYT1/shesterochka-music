@@ -4,6 +4,7 @@ from src.client.side_menu_widget import SideMenu
 from src.client.settings_widget import SettingsMenu
 from src.client.tools.session import Session
 from src.client.animated_panel_widget import AnimatedPanel
+from src.client.tools.pixmap_tools import get_pixmap
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -18,6 +19,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init_ui(self) -> None:
         self.central_widget = QtWidgets.QWidget()
         self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.logo_label = QtWidgets.QLabel()
         self.settings_menu = SettingsMenu(self)
         self.side_menu = SideMenu(self)
         self.animated_widgets = [self.settings_menu, self.settings_menu.register_dialog, self.settings_menu.login_dialog]
@@ -28,8 +30,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resize(400, 500)
         self.session.set_parent(self)
         self.main_v_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignBottom)
-        self.main_v_layout.addWidget(self.side_menu)
+
+        self.logo_label.setFixedSize(256, 256)
+
+        self.main_v_layout.addSpacing(100)
+
+        self.logo_label.setPixmap(get_pixmap('logo_256px.png'))
+
+        self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.__button_clicked(button))
 
     def show_message(self, text: str, parent=None, error: bool=False):

@@ -103,6 +103,8 @@ class RegisterDialog(AnimatedPanel):
 
         if self.parent.session.auth:
             self.parent.show_message(text='Succesfully register')
+        else:
+            return
 
         self.parent.settings_menu.authorize_action()
 
