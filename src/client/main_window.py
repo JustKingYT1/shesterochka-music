@@ -31,6 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.session.set_parent(self)
         self.main_v_layout.setContentsMargins(0, 0, 0, 0)
 
+        self.main_v_layout.addWidget(self.music_item)
+
         self.logo_label.setFixedSize(256, 256)
 
         self.main_v_layout.addSpacing(100)

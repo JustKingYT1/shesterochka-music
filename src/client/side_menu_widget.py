@@ -3,7 +3,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 class SideMenu(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
-        super().__init__(parent)
+        super(SideMenu, self).__init__(parent)
         self.__init_ui()
         self.__setting_ui()
 
