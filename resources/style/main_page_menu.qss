@@ -1,0 +1,59 @@
+QFrame#MainPageMenu{
+    background-color: rgba(40, 40, 40, 128);
+    border-radius: 10px;
+}
+
+QFrame#ScrollFrame,
+QWidget#ScrollWidget,
+QScrollArea#ScrollArea{
+    background-color: rgba(35, 35, 35, 128);
+    border-radius: 10px;
+}
+
+QScrollBar#ScrollBar{
+    border-radius: 3px;
+    background-color: rgb(60, 60, 60);
+}
+
+QScrollBar#ScrollBar::add-page,
+QScrollBar#ScrollBar::sub-page
+{
+    background-color: rgb(60, 60, 60);
+    border-radius: 3px;
+}
+
+QScrollBar#ScrollBar::add-line,
+QScrollBar#ScrollBar::sub-line{
+    max-height: 0px;
+    max-width: 0px;
+    border-radius: 3px;
+}
+
+QScrollBar#ScrollBar::handle{
+    background-color: rgb(80, 80, 80);
+    border-radius: 3px;
+}
+
+QFrame#MusicFrame{
+    background-color: rgba(70, 70, 70, 128);
+    border-radius: 7px;
+}
+
+QFrame#MusicFrame::hover{
+    background-color: rgba(85, 85, 85, 128);
+}
+
+QFrame#MusicFrame>QLabel{
+    color: white;
+}
+
+
+QFrame#MusicFrame>QLabel#InfoLabel{
+    color: rgb(200, 200, 200);
+}
+
+QFrame#MusicFrame>QLabel#ImageLabel{
+    border-radius: 0.5px;
+}
+
+QLabel{color: white;}

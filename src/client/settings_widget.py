@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
+from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.dialog_widgets.register_dialog_widget import RegisterDialog
 from src.client.dialog_widgets.login_dialog_widget import LoginDialog
 
@@ -26,8 +27,13 @@ class SettingsMenu(AnimatedPanel):
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
+        self.setObjectName('SettingsMenu')
         self.main_v_layout.setContentsMargins(10, 10, 10, 10)
-        
+        set_style_sheet_for_widget(self, 'settings_menu.qss')
+
+        self.log_in_button.setObjectName('LoginButton')
+        self.register_label.setObjectName('RegisterLabel')
+
         self.user_image_label.setFixedSize(128, 128)
         self.user_image_label.setPixmap(get_pixmap('user_undefined.png'))
 
@@ -38,6 +44,8 @@ class SettingsMenu(AnimatedPanel):
         self.exit_button.clicked.connect(self.exit_button_clicked)
         self.log_in_button.clicked.connect(self.open_login_dialog)
         self.exit_button.hide()
+
+        self.exit_button.setIcon(get_pixmap('exit.png'))
 
         self.main_v_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
         self.user_profile_layout.addWidget(self.user_image_label)
@@ -64,19 +72,21 @@ class SettingsMenu(AnimatedPanel):
         self.raise_()
         self.register_dialog.start_animation()
         self.register_dialog.raise_()
+        self.parent.opened_widget = self.register_dialog
     
     def open_login_dialog(self) -> None:
         self.start_animation()
         self.raise_()
         self.login_dialog.start_animation()
         self.login_dialog.raise_()
+        self.parent.opened_widget = self.login_dialog
 
     def authorize_action(self) -> None:
         self.user_nickname_label.setText(self.parent.session.user.nickname)
         self.log_in_button.hide()
         self.register_label.hide()
         self.exit_button.show()
-        self.main_v_layout.addSpacing(90)
+        self.size_expand()
 
     def exit_button_clicked(self) -> None:
         self.exit_account()
@@ -87,4 +97,4 @@ class SettingsMenu(AnimatedPanel):
         self.log_in_button.show()
         self.register_label.show()
         self.exit_button.hide()
-        self.main_v_layout.addSpacing(0)
+        self.size_expand()
