@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui, QtMultimedia
 import sys
 from src.client.side_menu_widget import SideMenu
 from src.client.settings_widget import SettingsMenu
@@ -12,6 +12,7 @@ from src.client.tools.style_setter import set_style_sheet_for_widget
 class MainWindow(QtWidgets.QMainWindow):
     session: Session = Session() # type: ignore
     opened_widget: AnimatedPanel = None
+    media_player: QtMultimedia.QMediaPlayer = QtMultimedia.QMediaPlayer()
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
         self.__init_ui()
@@ -24,6 +25,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logo_label = QtWidgets.QLabel()
         self.settings_menu = SettingsMenu(self)
         self.main_page_menu = MainPageMenu(self)
+        self.my_music_menu = None
+        self.timer = QtCore.QTimer(self)
         self.side_menu = SideMenu(self)
         self.animated_widgets = [self.settings_menu, 
                                  self.settings_menu.register_dialog, 
@@ -51,9 +54,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.side_menu.my_music_button.set_widget(self)
         self.side_menu.settings_button.set_widget(self.settings_menu)
 
+        self.main_page_menu.set_button(self.side_menu.main_page_button)
+        # self.my_music_menu.set_button(self.side_menu.my_music_button)
+        self.settings_menu.set_button(self.side_menu.settings_button)
+
         self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
-        self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.__button_clicked(button))
+        self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.button_clicked(button))
 
     def show_message(self, text: str, parent=None, error: bool=False):
         message_box = QtWidgets.QMessageBox(parent if parent else self)
@@ -61,15 +68,30 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setText(text)
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         message_box.exec()
+    
+    def widget_switch_animation(self, button) -> None:
+        if self.opened_widget: 
+            if self.opened_widget != button.widget:
+                self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button))
+                self.start_widget_animation(self.opened_widget)
+            elif self.opened_widget == button.widget:
+                self.start_widget_animation(button.widget)
+        else:
+            self.start_widget_animation(button.widget)
+    
+    def start_widget_animation(self, widget: AnimatedPanel) -> None:
+        if widget.button:
+            widget.button.toggle_pressed()
+        widget.start_animation()
+        widget.raise_()
+        self.opened_widget = widget
 
-    def __button_clicked(self, button) -> None:
-        button.toggle_pressed()
-        if self.opened_widget:
-            self.opened_widget.start_animation() if self.opened_widget != button.widget else None
-        button.widget.start_animation()
-        button.widget.raise_()
-        self.opened_widget = button.widget
-        
+    def on_timer_finished(self, button) -> None:
+        self.start_widget_animation(button.widget)
+
+    def button_clicked(self, button) -> None:
+        self.widget_switch_animation(button)
+
         
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 class AnimatedPanel(QtWidgets.QFrame):
     is_opened: bool = False
+    button: QtWidgets.QPushButton = None
     main_v_layout: QtWidgets.QVBoxLayout = None
     animation_pos: QtCore.QPropertyAnimation = None
     animation_size: QtCore.QPropertyAnimation = None
@@ -21,8 +22,11 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.animation_pos.setTargetObject(self)
     
     def __setting_ui(self) -> None:
-        self.animation_size.setDuration(500)
-        self.animation_pos.setDuration(500)
+        self.animation_size.setDuration(320)
+        self.animation_pos.setDuration(320)
+
+    def set_button(self, button) -> None:
+        self.button = button
 
     def start_animation(self, 
                         start_value_pos: QtCore.QPoint = None, 

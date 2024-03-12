@@ -101,7 +101,4 @@ class LoginDialog(AnimatedPanel):
         self.cancel_button_clicked()
     
     def cancel_button_clicked(self) -> None:
-        self.start_animation()
-        self.parent.settings_menu.start_animation()
-
-
+        self.parent.widget_switch_animation(self.parent.side_menu.settings_button)
