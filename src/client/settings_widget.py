@@ -20,6 +20,7 @@ class SettingsMenu(AnimatedPanel):
         self.user_profile_layout = QtWidgets.QVBoxLayout()
         self.register_dialog = RegisterDialog(self.parent)
         self.login_dialog = LoginDialog(self.parent)
+        self.spacer = QtWidgets.QSpacerItem(0, 100)
         self.user_nickname_label = QtWidgets.QLabel('Гость')
         self.user_image_label = QtWidgets.QLabel('Пользователь')
         self.log_in_button = QtWidgets.QPushButton('Войти')
@@ -72,6 +73,8 @@ class SettingsMenu(AnimatedPanel):
         self.raise_()
         self.register_dialog.start_animation()
         self.register_dialog.raise_()
+        if self.parent.opened_widget.button:
+            self.parent.opened_widget.button.toggle_pressed()
         self.parent.opened_widget = self.register_dialog
     
     def open_login_dialog(self) -> None:
@@ -79,6 +82,8 @@ class SettingsMenu(AnimatedPanel):
         self.raise_()
         self.login_dialog.start_animation()
         self.login_dialog.raise_()
+        if self.parent.opened_widget.button:
+            self.parent.opened_widget.button.toggle_pressed()
         self.parent.opened_widget = self.login_dialog
 
     def authorize_action(self) -> None:
@@ -86,6 +91,7 @@ class SettingsMenu(AnimatedPanel):
         self.log_in_button.hide()
         self.register_label.hide()
         self.exit_button.show()
+        self.main_v_layout.addSpacerItem(self.spacer)
         self.size_expand()
 
     def exit_button_clicked(self) -> None:
@@ -97,4 +103,5 @@ class SettingsMenu(AnimatedPanel):
         self.log_in_button.show()
         self.register_label.show()
         self.exit_button.hide()
+        self.main_v_layout.removeItem(self.spacer)
         self.size_expand()
