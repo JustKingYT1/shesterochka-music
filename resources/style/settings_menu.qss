@@ -1,0 +1,33 @@
+QFrame#SettingsMenu{
+    background-color: rgba(40, 40, 40, 128);
+    border-radius: 10px;
+}
+
+QFrame#SettingsMenu>QPushButton#LoginButton{
+    background-color: rgba(85, 85, 85, 128); 
+    border-radius: 4px;
+    color: white;
+}
+
+QFrame#SettingsMenu>QPushButton#LoginButton::hover{
+    background-color: rgba(100, 100, 100, 128);
+    border-radius: 4px;
+    color: black;
+}
+
+QFrame#SettingsMenu>QLabel#RegisterLabel{
+    color: rgba(85, 85, 85, 128);
+}
+
+QFrame#SettingsMenu>QLabel#RegisterLabel::hover{
+    color: rgba(100, 100, 100, 128);
+}
+
+QToolButton{
+    background-color: rgba(40, 40, 40, 128);
+    border-radius: 3px;
+}
+
+QLabel{
+    color: white;
+}

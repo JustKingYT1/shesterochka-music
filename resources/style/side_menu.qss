@@ -1,0 +1,9 @@
+QWidget#SideMenu{
+	background-color: rgb(60, 60, 60);
+	border-radius: 10px;
+}
+
+SideButton{
+	background-color: rgb(30, 30, 30);
+	border-radius: 15px;
+}
