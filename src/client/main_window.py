@@ -59,6 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box = QtWidgets.QMessageBox(parent if parent else self)
         message_box.setIcon(QtWidgets.QMessageBox.Icon.Information if not error else QtWidgets.QMessageBox.Icon.Critical)
         message_box.setText(text)
+        #https://youtu.be/xwGvW600e2c?si=2H9NRwteRmZOFYrc
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         message_box.exec()
 
