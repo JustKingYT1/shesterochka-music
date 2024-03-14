@@ -58,22 +58,19 @@ class MainPageMenu(AnimatedPanel):
         self.music_list.clear()
 
         for file in files:
-            print(file)
             self.load_track(file)
 
     def size_expand(self) -> None:
+        print(self.parent)
         self.resize(self.parent.width() - 20, self.parent.height() - 70)
 
         for music in self.music_list:
             music.size_expand()
-
-
         
     class MusicFrame(QtWidgets.QFrame):
         music: AudioFile
         def __init__(self, parent: QtWidgets.QWidget, music: AudioFile) -> None:
-            super().__init__(parent)
-
+            super(MainPageMenu.MusicFrame, self).__init__(parent)
             self.parent = parent
             self.music = music
 
@@ -82,7 +79,6 @@ class MainPageMenu(AnimatedPanel):
 
         def __init_ui(self) -> None:
             self.main_h_layout = QtWidgets.QHBoxLayout()
-            self.album_and_artist_h_layout = QtWidgets.QHBoxLayout()
             self.info_v_layout = QtWidgets.QVBoxLayout()
             self.title_label = QtWidgets.QLabel(self.music.tag.title)
             self.info_label = QtWidgets.QLabel(f'{self.music.tag.artist} • {self.music.tag.album}')
@@ -91,8 +87,8 @@ class MainPageMenu(AnimatedPanel):
         def __setting_ui(self) -> None:
             self.setLayout(self.main_h_layout)
             self.setObjectName('MusicFrame')
-            self.main_h_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
             self.main_h_layout.setContentsMargins(0, 0, 0, 0)
+            self.main_h_layout.insertItem(0, QtWidgets.QSpacerItem(4, 0))
             self.main_h_layout.addWidget(self.image_label)
             self.image_label.setScaledContents(True)
             self.image_label.setFixedSize(30, 30)

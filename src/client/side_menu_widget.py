@@ -4,7 +4,7 @@ from src.client.tools.pixmap_tools import get_pixmap
 from src.client.animated_panel_widget import AnimatedPanel
 
 
-class SideMenu(QtWidgets.QWidget):
+class SideMenu(QtWidgets.QFrame):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super(SideMenu, self).__init__(parent)
         self.__init_ui()
@@ -20,10 +20,12 @@ class SideMenu(QtWidgets.QWidget):
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_h_layout)
-
+        
         self.setObjectName('SideMenu')
 
         set_style_sheet_for_widget(self, 'side_menu.qss')
+
+        self.main_h_layout.setContentsMargins(5, 5, 5, 5)
         
         self.main_h_layout.addWidget(self.main_page_button)
         self.main_h_layout.addWidget(self.my_music_button)

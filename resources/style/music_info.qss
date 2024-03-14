@@ -1,0 +1,14 @@
+MusicInfo{
+    background-color: rgb(50, 50, 50);
+    border-radius: 10px;
+    border: 2px solid #535353;
+}
+
+QLabel{
+    color: white;
+}
+
+SideButton{
+    background-color: rgb(50, 50, 50);
+    border-radius: 10px;
+}

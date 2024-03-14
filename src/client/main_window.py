@@ -7,6 +7,9 @@ from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.main_page_widget import MainPageMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.client.music_info_widget import MusicInfo
+import settings
+import eyed3
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -26,12 +29,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_menu = SettingsMenu(self)
         self.main_page_menu = MainPageMenu(self)
         self.my_music_menu = None
+        self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/Music_1.mp3'))
         self.timer = QtCore.QTimer(self)
         self.side_menu = SideMenu(self)
-        self.animated_widgets = [self.settings_menu, 
-                                 self.settings_menu.register_dialog, 
-                                 self.settings_menu.login_dialog, 
-                                 self.main_page_menu]
 
     def __setting_ui(self) -> None:
         self.setCentralWidget(self.central_widget)
@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.central_widget.setLayout(self.main_v_layout)
         self.resize(400, 500)
         self.session.set_parent(self)
-        self.main_v_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_v_layout.setContentsMargins(10, 10, 10, 10)
 
         self.logo_label.setFixedSize(256, 256)
 
@@ -59,6 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_menu.set_button(self.side_menu.settings_button)
 
         self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.button_clicked(button))
 
@@ -75,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.opened_widget = button.widget
             if self.opened_widget != button.widget:
                 self.start_widget_animation(self.opened_widget)
-                self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button))
+                self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button.widget))
             elif self.opened_widget == button.widget:
                 self.start_widget_animation(button.widget)
         else:
@@ -88,9 +89,8 @@ class MainWindow(QtWidgets.QMainWindow):
         widget.raise_()
         self.opened_widget = widget
 
-    def on_timer_finished(self, button) -> None:
-        self.start_widget_animation(button.widget)
-        print(3)
+    def on_timer_finished(self, widget) -> None:
+        self.start_widget_animation(widget)
 
     def button_clicked(self, button) -> None:
         self.widget_switch_animation(button)

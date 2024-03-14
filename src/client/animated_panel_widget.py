@@ -67,4 +67,4 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.hide()
     
     def size_expand(self) -> None:
-        self.resize(self.parent.width() - 20, self.parent.height() - 70)
+        self.resize(self.parent.width() - 20, self.parent.height() - 30)
