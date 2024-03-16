@@ -28,6 +28,11 @@ QToolButton{
     border-radius: 3px;
 }
 
+QToolButton::hover{
+    background-color: rgba(80, 80, 80, 128);
+    border-radius: 3px;
+}
+
 QLabel{
     color: white;
 }

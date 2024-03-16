@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtCore, QtGui, QtMultimedia
+from PySide6 import QtWidgets, QtCore, QtGui
 import sys
 from src.client.side_menu_widget import SideMenu
 from src.client.settings_widget import SettingsMenu
@@ -15,7 +15,6 @@ import eyed3
 class MainWindow(QtWidgets.QMainWindow):
     session: Session = Session() # type: ignore
     opened_widget: AnimatedPanel = None
-    media_player: QtMultimedia.QMediaPlayer = QtMultimedia.QMediaPlayer()
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
         self.__init_ui()
@@ -38,21 +37,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setObjectName('MainWindow')
         set_style_sheet_for_widget(self, 'main_window.qss')
         self.central_widget.setLayout(self.main_v_layout)
-        self.resize(400, 500)
+        self.setFixedSize(400, 500)
         self.session.set_parent(self)
         self.main_v_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.logo_label.setFixedSize(256, 256)
+        self.logo_label.setFixedSize(128, 128)
 
-        self.main_v_layout.addSpacing(100)
+        self.main_v_layout.addSpacing(70)
 
-        self.logo_label.setPixmap(get_pixmap('logo_256px.png'))
+        # movie = QtGui.QMovie(f'{settings.IMG_DIR}/logo1.gif')
 
-        self.main_page_menu.size_expand()
+        # self.logo_label.setMovie(movie)
+
+        # movie.start()
 
         self.side_menu.main_page_button.set_widget(self.main_page_menu)
         self.side_menu.my_music_button.set_widget(self)
         self.side_menu.settings_button.set_widget(self.settings_menu)
+
+        self.main_page_menu.size_expand()
+        self.settings_menu.size_expand()
 
         self.main_page_menu.set_button(self.side_menu.main_page_button)
         # self.my_music_menu.set_button(self.side_menu.my_music_button)
@@ -70,13 +74,13 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         message_box.exec()
     
-    def widget_switch_animation(self, button) -> None:
+    def widget_switch_animation(self, button=None, widget=None) -> None:
         if self.opened_widget: 
             if not self.opened_widget.isVisible():
-                    self.opened_widget = button.widget
-            if self.opened_widget != button.widget:
+                self.opened_widget = button.widget if button else widget
+            if self.opened_widget != (widget if not button else button.widget):
                 self.start_widget_animation(self.opened_widget)
-                self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button.widget))
+                self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button.widget if button else widget))
             elif self.opened_widget == button.widget:
                 self.start_widget_animation(button.widget)
         else:

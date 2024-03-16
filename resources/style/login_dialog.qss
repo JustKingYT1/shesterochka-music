@@ -1,0 +1,43 @@
+LoginDialog{
+    background-color: rgba(40, 40, 40, 128);
+    border-radius: 10px;
+}
+
+QLabel{
+    color: white;
+}
+
+QLineEdit{
+    background-color: rgba(55, 55, 55, 128);
+    color: white;
+    border-radius: 5px;
+}
+
+QLineEdit::hover{
+    background-color: rgba(90, 90, 90, 128);
+    border-radius: 5px;
+    color: black;
+}
+
+QToolButton{
+    background-color: rgba(40, 40, 40, 128);
+    border-radius: 4px;
+}
+
+QPushButton{
+    background-color: rgba(75, 75, 75, 128);
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+QToolButton::hover{
+    background-color: rgba(80, 80, 80, 128);
+    border-radius: 4px;
+}
+
+QPushButton::hover{
+    background-color: rgba(90, 90, 90, 128);
+    border-radius: 4px;
+    color:black;
+}

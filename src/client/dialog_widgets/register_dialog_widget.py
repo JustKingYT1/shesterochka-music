@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
+from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.database_models import UserModel
 
 
@@ -37,27 +38,32 @@ class RegisterDialog(AnimatedPanel):
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
 
-        self.main_v_layout.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('RegisterDialog')
+
+        set_style_sheet_for_widget(self, 'register_dialog.qss')
+
+        self.main_v_layout.setContentsMargins(10, 10, 10, 10)
 
         self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        self.main_v_layout.addWidget(self.cancel_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.main_v_layout.addWidget(self.cancel_button, 1, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
 
-        self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 15))
-
-        self.register_values_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.register_values_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.logo_label.setFixedSize(128, 128)
 
-        self.logo_label.setPixmap(get_pixmap('logo_128px.png'))
+        self.logo_label.setPixmap(get_pixmap('logo_126px.png'))
+        self.cancel_button.setIcon(get_pixmap('exit_reversed.png'))
 
-        self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.logo_label.setObjectName('LogoLabel')
+
+        self.main_v_layout.addWidget(self.logo_label, 1, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 35))
-        self.main_v_layout.addWidget(self.title_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.title_label,1, QtCore.Qt.AlignmentFlag.AlignCenter| QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 35))
 
-        self.main_v_layout.addLayout(self.register_values_layout)
+        self.main_v_layout.addLayout(self.register_values_layout, 2)
 
         self.register_values_layout.addLayout(self.label_layout)
         self.register_values_layout.addLayout(self.line_edit_layout)
@@ -74,7 +80,7 @@ class RegisterDialog(AnimatedPanel):
         self.password_line_edit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.confirm_line_edit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
 
-        self.main_v_layout.addWidget(self.register_button, 0, QtCore.Qt.AlignmentFlag.AlignRight)
+        self.main_v_layout.addWidget(self.register_button, 3, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignTop)
         
         self.register_button.clicked.connect(self.register_button_clicked)
         self.cancel_button.clicked.connect(self.cancel_button_clicked)

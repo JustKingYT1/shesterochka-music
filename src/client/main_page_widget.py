@@ -16,7 +16,6 @@ class MainPageMenu(AnimatedPanel):
         self.__setting_ui()
     
     def __init_ui(self) -> None:
-        self.main_v_layout = QtWidgets.QVBoxLayout()
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_widget = QtWidgets.QWidget()
         self.scroll_layout = QtWidgets.QVBoxLayout()
@@ -61,9 +60,7 @@ class MainPageMenu(AnimatedPanel):
             self.load_track(file)
 
     def size_expand(self) -> None:
-        print(self.parent)
-        self.resize(self.parent.width() - 20, self.parent.height() - 70)
-
+        self.resize(self.parent.width() - 20, self.parent.height() - 55)
         for music in self.music_list:
             music.size_expand()
         

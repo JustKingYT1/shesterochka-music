@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
+from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.database_models import UserModel
 
 
@@ -35,11 +36,13 @@ class LoginDialog(AnimatedPanel):
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
 
-        self.main_v_layout.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('LoginDialog')
 
-        self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        set_style_sheet_for_widget(self, 'login_dialog.qss')
 
-        self.main_v_layout.addWidget(self.cancel_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.main_v_layout.setContentsMargins(10, 10, 10, 10)
+
+        self.main_v_layout.addWidget(self.cancel_button, 1, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
 
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 15))
 
@@ -47,15 +50,16 @@ class LoginDialog(AnimatedPanel):
 
         self.logo_label.setFixedSize(128, 128)
 
-        self.logo_label.setPixmap(get_pixmap('logo_128px.png'))
+        self.logo_label.setPixmap(get_pixmap('logo_126px.png'))
+        self.cancel_button.setIcon(get_pixmap('exit_reversed.png'))
 
-        self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.logo_label, 2, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 35))
-        self.main_v_layout.addWidget(self.title_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_v_layout.addWidget(self.title_label, 3, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 35))
 
-        self.main_v_layout.addLayout(self.login_values_layout)
+        self.main_v_layout.addLayout(self.login_values_layout, 5)
 
         self.login_values_layout.addLayout(self.label_layout)
         self.login_values_layout.addLayout(self.line_edit_layout)
@@ -68,7 +72,7 @@ class LoginDialog(AnimatedPanel):
 
         self.password_line_edit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
 
-        self.main_v_layout.addWidget(self.login_button, 0, QtCore.Qt.AlignmentFlag.AlignRight)
+        self.main_v_layout.addWidget(self.login_button, 7, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignTop)
         
         self.login_button.clicked.connect(self.register_button_clicked)
         self.cancel_button.clicked.connect(self.cancel_button_clicked)
