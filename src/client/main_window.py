@@ -8,12 +8,14 @@ from src.client.tools.pixmap_tools import get_pixmap
 from src.client.main_page_widget import MainPageMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.music_info_widget import MusicInfo
+from src.client.music_session import MusicSession
 import settings
 import eyed3
 
 
 class MainWindow(QtWidgets.QMainWindow):
     session: Session = Session() # type: ignore
+    music_session: MusicSession = None
     opened_widget: AnimatedPanel = None
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
@@ -24,11 +26,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init_ui(self) -> None:
         self.central_widget = QtWidgets.QWidget()
         self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.music_session = MusicSession(self)
         self.logo_label = QtWidgets.QLabel()
         self.settings_menu = SettingsMenu(self)
         self.main_page_menu = MainPageMenu(self)
-        self.my_music_menu = None
-        self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/Music_1.mp3'))
+        self.my_music_menu = MainPageMenu(self)
+        self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.timer = QtCore.QTimer(self)
         self.side_menu = SideMenu(self)
 
@@ -52,15 +55,18 @@ class MainWindow(QtWidgets.QMainWindow):
         # movie.start()
 
         self.side_menu.main_page_button.set_widget(self.main_page_menu)
-        self.side_menu.my_music_button.set_widget(self)
+        self.side_menu.my_music_button.set_widget(self.my_music_menu)
         self.side_menu.settings_button.set_widget(self.settings_menu)
 
         self.main_page_menu.size_expand()
         self.settings_menu.size_expand()
 
         self.main_page_menu.set_button(self.side_menu.main_page_button)
-        # self.my_music_menu.set_button(self.side_menu.my_music_button)
+        self.my_music_menu.set_button(self.side_menu.my_music_button)
         self.settings_menu.set_button(self.side_menu.settings_button)
+
+        self.main_page_menu.load_music()
+        self.my_music_menu.load_music(my_music_flag=True)
 
         self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)

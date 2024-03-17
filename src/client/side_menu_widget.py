@@ -14,7 +14,7 @@ class SideMenu(QtWidgets.QFrame):
         self.main_h_layout = QtWidgets.QHBoxLayout()
         self.group_buttons = QtWidgets.QButtonGroup()
         icon_size = QtCore.QSize(20, 20)
-        self.main_page_button = SideMenu.SideButton(self, 'main_page', icon_size)
+        self.main_page_button = SideMenu.SideButton(self, 'main_music', icon_size)
         self.my_music_button = SideMenu.SideButton(self, 'my_music', icon_size)
         self.settings_button = SideMenu.SideButton(self, 'settings', icon_size)
 

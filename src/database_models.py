@@ -25,8 +25,9 @@ class User(BaseModel):
 
 
 class Music(BaseModel):
-    title = peewee.CharField()
-    artist = peewee.CharField()
+    title = peewee.CharField(null=False)
+    artist = peewee.CharField(null=False)
+    path = peewee.CharField(null=False, unique=True)
 
     class Meta:
         database = database

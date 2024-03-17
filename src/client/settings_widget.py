@@ -15,6 +15,7 @@ class SettingsMenu(AnimatedPanel):
 
     def __init_ui(self) -> None:
         self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.main_widget = QtWidgets.QWidget()
         self.exit_button = QtWidgets.QToolButton()
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
         self.user_profile_widget = QtWidgets.QWidget()
