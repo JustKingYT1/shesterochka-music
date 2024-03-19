@@ -33,10 +33,10 @@ class AnimatedPanel(QtWidgets.QFrame):
                         end_value_pos: QtCore.QPoint = None,
                         start_value_size: QtCore.QPoint = None,
                         end_value_size: QtCore.QPoint = None) -> None:
-        self.set_values_for_animation(start_value_pos if start_value_pos else QtCore.QPoint(10, self.parent.height() - 55),
-                                      end_value_pos if end_value_pos else QtCore.QPoint(10, 10),
-                                      start_value_size if start_value_size else QtCore.QSize(self.parent.width() - 20, 10),
-                                      end_value_size if end_value_size else QtCore.QSize(self.parent.width() - 20, self.parent.height() - 55))
+        self.set_values_for_animation(start_value_pos if start_value_pos else QtCore.QPoint(7, self.parent.height() - 52.5),
+                                      end_value_pos if end_value_pos else QtCore.QPoint(7, 7),
+                                      start_value_size if start_value_size else QtCore.QSize(self.parent.width() - 13.5, 10),
+                                      end_value_size if end_value_size else QtCore.QSize(self.parent.width() - 13.5, self.parent.height() - 52.5))
         self.animation_size.start()
         self.animation_pos.start()
 
@@ -67,4 +67,4 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.hide()
     
     def size_expand(self) -> None:
-        self.resize(self.parent.width() - 20, self.parent.height() - 55)
+        self.resize(self.parent.width() - 13.5, self.parent.height() - 52.5)

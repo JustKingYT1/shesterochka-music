@@ -88,7 +88,7 @@ class LoginDialog(AnimatedPanel):
         if not self.validate_text_line_edits():
             self.parent.show_message(text='One or more fields is empty', 
                                      error=True, 
-                                     parent=self)
+                                     parent=self.parent)
             return
         
         self.parent.session.login(

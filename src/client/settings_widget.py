@@ -88,9 +88,6 @@ class SettingsMenu(AnimatedPanel):
         self.authorize_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.scroll_layout.addLayout(self.authorize_v_layout)
 
-        for i in range(self.scroll_layout.count()):
-            print(self.scroll_layout.itemAt(i).layout())
-
     def register_label_clicked(self, _) -> None:
         self.open_register_dialog()
 
@@ -125,9 +122,6 @@ class SettingsMenu(AnimatedPanel):
         self.main_v_layout.removeItem(self.spacer)
         self.parent.main_page_menu.reload_widget()
         self.parent.my_music_menu.reload_widget()
-        self.parent.music_info_widget.set_music(eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
-        self.parent.music_info_widget.play_button.setEnabled(False)
-        self.parent.music_info_widget.like_button.setEnabled(False)
         self.parent.music_info_widget.like_button.pressed = False
         self.parent.music_info_widget.like_button.toggle_pressed()
 

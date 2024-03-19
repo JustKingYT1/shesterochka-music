@@ -1,6 +1,7 @@
 RegisterDialog{
-    background-color: rgba(40, 40, 40, 128);
+    background-color: rgba(35, 35, 35, 128);
     border-radius: 10px;
+    border: 2px solid rgba(40, 40, 40, 128);
 }
 
 QLabel{

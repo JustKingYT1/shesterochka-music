@@ -9,6 +9,7 @@ import eyed3
 class MusicInfo(MainPageMenu.MusicFrame):
     def __init__(self, parent: QtWidgets.QWidget, music: eyed3.AudioFile) -> None:
         super(MusicInfo, self).__init__(parent, music)
+        self.parent = parent
         self.__init_ui()
         self.__setting_ui()
         self.show()
@@ -41,18 +42,15 @@ class MusicInfo(MainPageMenu.MusicFrame):
             UserPlaylists.get((UserPlaylists.user_id==self.parent.session.user.id) & (UserPlaylists.music_id == self.music.tag.id)).delete_instance()
         
         self.like_button.toggle_pressed()
-        self.parent.main_page_menu.reload_tracks(self.parent.main_page_menu.type)
-        self.parent.my_music_menu.reload_tracks(self.parent.my_music_menu.type)
-    
-            # GET OR NONE UserPlaylists((user_id == user_id, music_id == music_id) но 
-             # music_id у нас нет по умолчанию, поэтому 
-             # Для его получения ищем в Music(title == title, artist == artist)) если есть, то 
-             # Искусственно изменяю состояние кнопки
-             # Если нет, то ничего не делаю, и чтобы 
-             # При нажатии кнопки в обратную сторону
-             # Удалял из избранного трек идиотка тупая
+        self.parent.main_page_menu.reload_tracks()
+        self.parent.my_music_menu.reload_tracks()
 
     def like_button_clicked(self) -> None:
+        if self.parent.session.user.id == -1:
+            self.parent.show_message(text='Войдите в аккаунт для возможности добавлять музыку в избранное', 
+                                     error=True,
+                                     parent=self.parent)
+            return
         self.add_music_to_profile()
 
     def play_button_clicked(self) -> None:

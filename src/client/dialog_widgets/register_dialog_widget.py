@@ -99,7 +99,7 @@ class RegisterDialog(AnimatedPanel):
         if not self.validate_text_line_edits():
             self.parent.show_message(text='One or more fields is empty, or confirm password incorrect', 
                                      error=True, 
-                                     parent=self)
+                                     parent=self.parent)
             return
         
         self.parent.session.register(UserModel(

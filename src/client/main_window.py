@@ -31,8 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logo_label = QtWidgets.QLabel()
         self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
-        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic.value)
-        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic.value)
+        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)
+        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.timer = QtCore.QTimer(self)
 
@@ -77,6 +77,22 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setIcon(QtWidgets.QMessageBox.Icon.Information if not error else QtWidgets.QMessageBox.Icon.Critical)
         message_box.setText(text)
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+        message_box.buttons()[0].setStyleSheet('''
+                                                QPushButton{background-color: rgba(75, 75, 75, 128);
+                                                border-radius: 5px;
+                                                font-size: 10px;
+                                                color: white;}
+                                                
+                                                QPushButton::hover{
+                                                 background-color: rgba(90, 90, 90, 128);
+                                                }
+                                               
+                                                QPushButton::pressed{
+                                                 background-color: rgba(80, 80, 80, 128)
+                                                }
+                                               ''')
+        message_box.buttons()[0].setFixedSize(60, 20)
+        
         message_box.exec()
     
 
@@ -118,8 +134,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def button_clicked(self, button) -> None:
         self.widget_switch_animation(button)
-
-        
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
