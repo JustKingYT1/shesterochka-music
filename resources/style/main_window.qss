@@ -1,3 +1,8 @@
-MainWindow {
+QMainWindow#MainWindow {
     background-color: rgb(30, 30, 30);
+}
+
+MainWindow::title{
+    background-color: #333;
+    color: white;
 }

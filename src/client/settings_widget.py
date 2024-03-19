@@ -4,6 +4,8 @@ from src.client.tools.pixmap_tools import get_pixmap
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.dialog_widgets.register_dialog_widget import RegisterDialog
 from src.client.dialog_widgets.login_dialog_widget import LoginDialog
+import settings
+import eyed3
 
 
 class SettingsMenu(AnimatedPanel):
@@ -14,11 +16,11 @@ class SettingsMenu(AnimatedPanel):
         self.__setting_ui()
 
     def __init_ui(self) -> None:
-        self.main_v_layout = QtWidgets.QVBoxLayout()
-        self.main_widget = QtWidgets.QWidget()
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_widget = QtWidgets.QWidget()
+        self.scroll_layout = QtWidgets.QVBoxLayout()
         self.exit_button = QtWidgets.QToolButton()
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
-        self.user_profile_widget = QtWidgets.QWidget()
         self.user_profile_layout = QtWidgets.QVBoxLayout()
         self.register_dialog = RegisterDialog(self.parent)
         self.login_dialog = LoginDialog(self.parent)
@@ -30,18 +32,31 @@ class SettingsMenu(AnimatedPanel):
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
+        self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setObjectName('SettingsMenu')
         self.main_v_layout.setContentsMargins(10, 10, 10, 10)
         set_style_sheet_for_widget(self, 'settings_menu.qss')
 
+        self.main_v_layout.addWidget(self.scroll_area)
+
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setContentsMargins(0,0,0,0)
+
+        self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.verticalScrollBar().setMaximumWidth(0)
+        self.scroll_area.verticalScrollBar().setObjectName('ScrollBar')
+
         self.log_in_button.setObjectName('LoginButton')
         self.register_label.setObjectName('RegisterLabel')
-        self.user_profile_widget.setObjectName('UserProfileWidget')
+
+        self.scroll_widget.setObjectName('ScrollWidget')
+        self.scroll_area.setObjectName('ScrollArea')
+    
+        self.scroll_widget.setLayout(self.scroll_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
 
         self.user_image_label.setFixedSize(128, 128)
         self.user_image_label.setPixmap(get_pixmap('user_undefined.png'))
-
-        self.user_profile_widget.setLayout(self.user_profile_layout)
 
         self.exit_button.setFixedSize(24, 24)
 
@@ -55,7 +70,7 @@ class SettingsMenu(AnimatedPanel):
 
         self.exit_button.setIcon(get_pixmap('exit.png'))
 
-        self.main_v_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
+        self.scroll_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
 
         self.user_profile_layout.addWidget(self.user_image_label)
         
@@ -63,15 +78,18 @@ class SettingsMenu(AnimatedPanel):
 
         self.user_profile_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
-        self.main_v_layout.addWidget(self.user_profile_widget)
+        self.scroll_layout.addLayout(self.user_profile_layout)
 
-        self.main_v_layout.addSpacing(120)
+        self.scroll_layout.addSpacing(120)
 
         self.authorize_v_layout.addWidget(self.log_in_button)
         self.authorize_v_layout.addWidget(self.register_label)
 
         self.authorize_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.main_v_layout.addLayout(self.authorize_v_layout)
+        self.scroll_layout.addLayout(self.authorize_v_layout)
+
+        for i in range(self.scroll_layout.count()):
+            print(self.scroll_layout.itemAt(i).layout())
 
     def register_label_clicked(self, _) -> None:
         self.open_register_dialog()
@@ -91,6 +109,8 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.hide()
         self.exit_button.show()
         self.main_v_layout.addSpacerItem(self.spacer)
+        self.parent.main_page_menu.reload_widget()
+        self.parent.my_music_menu.reload_widget()
         self.size_expand()
 
     def exit_button_clicked(self) -> None:
@@ -103,4 +123,13 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.show()
         self.exit_button.hide()
         self.main_v_layout.removeItem(self.spacer)
+        self.parent.main_page_menu.reload_widget()
+        self.parent.my_music_menu.reload_widget()
+        self.parent.music_info_widget.set_music(eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
+        self.parent.music_info_widget.play_button.setEnabled(False)
+        self.parent.music_info_widget.like_button.setEnabled(False)
+        self.parent.music_info_widget.like_button.pressed = False
+        self.parent.music_info_widget.like_button.toggle_pressed()
+
+        self.start_animation()
         self.size_expand()

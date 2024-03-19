@@ -1,11 +1,12 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 import sys
+from src.database_models import UserPlaylists
 from src.client.side_menu_widget import SideMenu
 from src.client.settings_widget import SettingsMenu
 from src.client.tools.session import Session
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
-from src.client.main_page_widget import MainPageMenu
+from src.client.main_page_widget import MainPageMenu, TypesMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.music_info_widget import MusicInfo
 from src.client.music_session import MusicSession
@@ -28,15 +29,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_v_layout = QtWidgets.QVBoxLayout()
         self.music_session = MusicSession(self)
         self.logo_label = QtWidgets.QLabel()
+        self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
-        self.main_page_menu = MainPageMenu(self)
-        self.my_music_menu = MainPageMenu(self)
+        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic.value)
+        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic.value)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.timer = QtCore.QTimer(self)
-        self.side_menu = SideMenu(self)
 
     def __setting_ui(self) -> None:
         self.setCentralWidget(self.central_widget)
+        self.setWindowTitle('Shesterocka Music')
         self.setObjectName('MainWindow')
         set_style_sheet_for_widget(self, 'main_window.qss')
         self.central_widget.setLayout(self.main_v_layout)
@@ -65,9 +67,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.my_music_menu.set_button(self.side_menu.my_music_button)
         self.settings_menu.set_button(self.side_menu.settings_button)
 
-        self.main_page_menu.load_music()
-        self.my_music_menu.load_music(my_music_flag=True)
-
         self.main_v_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
@@ -80,6 +79,21 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         message_box.exec()
     
+
+    def change_current_music_widget_style(self) -> None:
+        if not self.music_session.hasAudio():
+            self.music_info_widget.play_button.setEnabled(True)
+            self.music_info_widget.like_button.setEnabled(True)
+        if self.music_session.widget:
+            if self.music_session.widget.toggle:
+                self.music_session.widget.toggle_pressed()
+    
+    def change_state_like_button(self) -> None:
+        if not self.music_info_widget.like_button.pressed:
+            self.music_info_widget.like_button.toggle_pressed()
+        self.music_info_widget.like_button.toggle_pressed() if UserPlaylists.get_or_none((UserPlaylists.user_id==self.session.user.id) & \
+                                                                (UserPlaylists.music_id == self.music_info_widget.music.tag.id)) else None
+
     def widget_switch_animation(self, button=None, widget=None) -> None:
         if self.opened_widget: 
             if not self.opened_widget.isVisible():

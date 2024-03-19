@@ -1,36 +1,52 @@
 QFrame#SettingsMenu{
-    background-color: rgba(40, 40, 40, 128);
+    background-color: rgba(35, 35, 35, 128);
+    border-radius: 10px;
+    border: 2px solid rgba(40, 40, 40, 128)
+}
+
+QFrameScrollFrame,
+QWidget#ScrollWidget,
+QScrollBar#ScrollBar,
+QScrollArea#ScrollArea{
+    background-color: rgba(35, 35, 35, 8);
     border-radius: 10px;
 }
 
-QFrame#SettingsMenu>QPushButton#LoginButton{
+QScrollBar#ScrollBar::add-page,
+QScrollBar#ScrollBar::sub-page{
+    background-color: rgba(60, 60, 60, 128);
+    border-radius: 10px
+}
+
+QPushButton#LoginButton{
     background-color: rgba(85, 85, 85, 128); 
     border-radius: 4px;
     color: white;
 }
 
-QFrame#SettingsMenu>QPushButton#LoginButton::hover{
+QPushButton#LoginButton::hover{
     background-color: rgba(100, 100, 100, 128);
-    border-radius: 4px;
-    color: black;
 }
 
-QFrame#SettingsMenu>QLabel#RegisterLabel{
+QPushButton#LoginButton::pressed{
+    background-color: rgba(80, 80, 80, 128);
+}
+
+QLabel#RegisterLabel{
     color: rgba(85, 85, 85, 128);
 }
 
-QFrame#SettingsMenu>QLabel#RegisterLabel::hover{
+QLabel#RegisterLabel::hover{
     color: rgba(100, 100, 100, 128);
 }
 
 QToolButton{
-    background-color: rgba(40, 40, 40, 128);
+    background-color: rgba(35, 35, 35, 128);
     border-radius: 3px;
 }
 
 QToolButton::hover{
-    background-color: rgba(80, 80, 80, 128);
-    border-radius: 3px;
+    background-color: rgba(50, 50, 50, 128);
 }
 
 QLabel{

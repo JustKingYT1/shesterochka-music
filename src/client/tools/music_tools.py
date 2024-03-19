@@ -11,13 +11,16 @@ def get_music_in_music_dir(sort: bool = False, my_music_flag: bool=False, user_i
                 if file.endswith('.mp3')] 
     else:
         files = []
-        records = UserPlaylists.select().where(user_id == user_id)
+        records = UserPlaylists.select().where(UserPlaylists.user_id == user_id)
         for record in records:
             files.append(eyed3.load(Music.get(Music.id == record.music_id).path))
 
     for file in files:
         if not file.tag:
             file.initTag()
+
+        if file.tag.title != 'Unknown' and file.tag.artist != 'Unknown':
+            file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist))
 
         file.tag.album = 'Unknown' if not file.tag.album else file.tag.album
         file.tag.title = 'Unknown' if not file.tag.title else file.tag.title

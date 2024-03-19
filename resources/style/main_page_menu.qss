@@ -11,11 +11,7 @@ QScrollArea#ScrollArea{
     border-radius: 10px;
 }
 
-QScrollBar#ScrollBar{
-    border-radius: 3px;
-    background-color: rgba(60, 60, 60, 128);
-}
-
+QScrollBar#ScrollBar,
 QScrollBar#ScrollBar::add-page,
 QScrollBar#ScrollBar::sub-page
 {
@@ -33,6 +29,27 @@ QScrollBar#ScrollBar::sub-line{
 QScrollBar#ScrollBar::handle{
     background-color: rgba(80, 80, 80, 128);
     border-radius: 3px;
+}
+
+QLabel#TitleLabel{
+    padding: 10px;
+    color: white;
+    background-color: rgba(55, 55, 55, 128);
+    border-radius: 15px;
+}
+
+QPushButton#ToSettingsButton{
+    background-color: rgba(70, 70, 70, 128);
+    border-radius: 15px;
+    color: white;
+}
+
+QPushButton#ToSettingsButton::hover{
+    background-color: rgba(85, 85, 85, 128);
+}
+
+QPushButton#ToSettingsButton::pressed{
+    background-color: rgba(65, 65, 65, 128);
 }
 
 QFrame#MusicFrame{

@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.main_page_widget import MainPageMenu
 from src.client.side_menu_widget import SideMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.database_models import User, UserPlaylists, Music
 import eyed3
 
 
@@ -31,9 +32,19 @@ class MusicInfo(MainPageMenu.MusicFrame):
         self.like_button.setEnabled(False)
 
         self.play_button.clicked.connect(self.play_button_clicked)
+        self.like_button.clicked.connect(self.like_button_clicked)
 
     def add_music_to_profile(self) -> None:
-        pass # GET OR NONE UserPlaylists((user_id == user_id, music_id == music_id) но 
+        if self.like_button.pressed:
+            UserPlaylists.create(user_id=self.parent.session.user.id, music_id=self.music.tag.id)
+        else:
+            UserPlaylists.get((UserPlaylists.user_id==self.parent.session.user.id) & (UserPlaylists.music_id == self.music.tag.id)).delete_instance()
+        
+        self.like_button.toggle_pressed()
+        self.parent.main_page_menu.reload_tracks(self.parent.main_page_menu.type)
+        self.parent.my_music_menu.reload_tracks(self.parent.my_music_menu.type)
+    
+            # GET OR NONE UserPlaylists((user_id == user_id, music_id == music_id) но 
              # music_id у нас нет по умолчанию, поэтому 
              # Для его получения ищем в Music(title == title, artist == artist)) если есть, то 
              # Искусственно изменяю состояние кнопки
@@ -42,7 +53,7 @@ class MusicInfo(MainPageMenu.MusicFrame):
              # Удалял из избранного трек идиотка тупая
 
     def like_button_clicked(self) -> None:
-        pass
+        self.add_music_to_profile()
 
     def play_button_clicked(self) -> None:
         self.switch_function()

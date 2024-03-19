@@ -15,15 +15,15 @@ class AnimatedPanel(QtWidgets.QFrame):
         self.hide()
     
     def __init_ui(self) -> None:
-        self.main_v_layout = QtWidgets.QHBoxLayout()
+        self.main_v_layout = QtWidgets.QVBoxLayout()
         self.animation_size = QtCore.QPropertyAnimation(self, b'size')
         self.animation_pos = QtCore.QPropertyAnimation(self, b'pos')
         self.animation_size.setTargetObject(self)
         self.animation_pos.setTargetObject(self)
     
     def __setting_ui(self) -> None:
-        self.animation_size.setDuration(320)
-        self.animation_pos.setDuration(320)
+        self.animation_size.setDuration(250)
+        self.animation_pos.setDuration(250)
 
     def set_button(self, button) -> None:
         self.button = button
