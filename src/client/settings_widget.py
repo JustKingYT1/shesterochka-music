@@ -68,7 +68,7 @@ class SettingsMenu(AnimatedPanel):
         self.log_in_button.clicked.connect(self.login_button_clicked)
         self.exit_button.hide()
 
-        self.exit_button.setIcon(get_pixmap('exit.png'))
+        self.exit_button.setIcon(get_pixmap('cancel.png'))
 
         self.scroll_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
 
@@ -106,7 +106,6 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.hide()
         self.exit_button.show()
         self.main_v_layout.addSpacerItem(self.spacer)
-        self.parent.main_page_menu.reload_widget()
         self.parent.my_music_menu.reload_widget()
         self.size_expand()
 

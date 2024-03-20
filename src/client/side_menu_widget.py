@@ -39,7 +39,7 @@ class SideMenu(QtWidgets.QFrame):
         self.group_buttons.addButton(self.my_music_button)
         self.group_buttons.addButton(self.settings_button)
 
-    class SideButton(QtWidgets.QPushButton):
+    class SideButton(QtWidgets.QToolButton):
         pixmap_name: str
         pressed: bool = False
         widget: AnimatedPanel = None

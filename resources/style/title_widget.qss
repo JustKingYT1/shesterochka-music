@@ -1,0 +1,25 @@
+QFrame#TitleWidget{
+    background-color: rgb(30, 30, 30);
+    border-radius: 10px;
+    border: 2px solid rgb(45, 45, 45);
+}
+
+QFrame#TitleWidget>QLabel{
+    color: white;
+}
+
+QToolButton,
+QPushButton{
+    background-color: rgb(30, 30, 30);
+    border-radius: 3px;
+}
+
+QPushButton::hover{
+    border-radius: 3px;
+    background-color: rgb(45, 45, 45);
+}
+
+QPushButton::pressed{
+    border-radius: 3px;
+    background-color: rgb(35, 35, 35);
+}

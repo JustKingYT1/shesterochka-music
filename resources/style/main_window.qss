@@ -1,7 +1,6 @@
 QMainWindow#MainWindow {
     background-color: rgb(30, 30, 30);
-    border: 2px solid rgba(50, 50, 50, 128);
-
+    border: 2px solid rgb(40, 40, 40);
 }
 
 MainWindow::title{
@@ -16,10 +15,4 @@ QMessageBox{
 
 QMessageBox>QLabel{
     color: white
-}
-
-QPushButton#StandartButton{
-    background-color: rgba(75, 75, 75, 128);
-    border-radius: 5px;
-    color: white;
 }

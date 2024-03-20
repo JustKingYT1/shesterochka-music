@@ -20,7 +20,7 @@ class LoginDialog(AnimatedPanel):
         self.label_layout = QtWidgets.QVBoxLayout()
         self.line_edit_layout = QtWidgets.QVBoxLayout()
 
-        self.logo_label = QtWidgets.QLabel()
+        self.logo_label = QtWidgets.QPushButton()
 
         self.title_label = QtWidgets.QLabel('<H1>Вход</H1>')
 
@@ -50,8 +50,9 @@ class LoginDialog(AnimatedPanel):
 
         self.logo_label.setFixedSize(128, 128)
 
-        self.logo_label.setPixmap(get_pixmap('logo_126px.png'))
-        self.cancel_button.setIcon(get_pixmap('exit_reversed.png'))
+        self.logo_label.setIcon(get_pixmap('logo.png'))
+        self.logo_label.setIconSize(QtCore.QSize(128, 128))
+        self.cancel_button.setIcon(get_pixmap('cancel_reversed.png'))
 
         self.main_v_layout.addWidget(self.logo_label, 2, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 35))

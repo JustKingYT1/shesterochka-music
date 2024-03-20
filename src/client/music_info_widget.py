@@ -7,6 +7,7 @@ import eyed3
 
 
 class MusicInfo(MainPageMenu.MusicFrame):
+    music_widget: MainPageMenu.MusicFrame
     def __init__(self, parent: QtWidgets.QWidget, music: eyed3.AudioFile) -> None:
         super(MusicInfo, self).__init__(parent, music)
         self.parent = parent
@@ -42,12 +43,11 @@ class MusicInfo(MainPageMenu.MusicFrame):
             UserPlaylists.get((UserPlaylists.user_id==self.parent.session.user.id) & (UserPlaylists.music_id == self.music.tag.id)).delete_instance()
         
         self.like_button.toggle_pressed()
-        self.parent.main_page_menu.reload_tracks()
         self.parent.my_music_menu.reload_tracks()
 
     def like_button_clicked(self) -> None:
         if self.parent.session.user.id == -1:
-            self.parent.show_message(text='Войдите в аккаунт для возможности добавлять музыку в избранное', 
+            self.parent.show_message(text='Войдите в аккаунт для возможности\nдобавлять музыку в избранное', 
                                      error=True,
                                      parent=self.parent)
             return
@@ -56,12 +56,14 @@ class MusicInfo(MainPageMenu.MusicFrame):
     def play_button_clicked(self) -> None:
         self.switch_function()
 
-    def set_music(self, music: eyed3.AudioFile) -> None:
+    def set_music(self, music_widget: MainPageMenu.MusicFrame) -> None:
         self.play_button.pressed = False
         self.play_button.toggle_pressed()
-        self.change_music(music)
+        self.change_music(music_widget)
     
-    def change_music(self, music: eyed3.AudioFile) -> None:
-        self.title_label.setText(music.tag.title)
-        self.info_label.setText(f'{music.tag.artist} • {music.tag.album}')
-        self.music = music
+    def change_music(self, music_widget: MainPageMenu.MusicFrame) -> None:
+        self.title_label.setText(music_widget.music.tag.title)
+        self.info_label.setText(f'{music_widget.music.tag.artist} • {music_widget.music.tag.album}')
+        self.image_label.setPixmap(music_widget.pixmap)
+        self.music_widget = music_widget
+        self.music = music_widget.music

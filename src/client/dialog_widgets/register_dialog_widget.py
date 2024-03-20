@@ -20,7 +20,7 @@ class RegisterDialog(AnimatedPanel):
         self.label_layout = QtWidgets.QVBoxLayout()
         self.line_edit_layout = QtWidgets.QVBoxLayout()
 
-        self.logo_label = QtWidgets.QLabel()
+        self.logo_label = QtWidgets.QPushButton()
 
         self.title_label = QtWidgets.QLabel('<H1>Регистрация</H1>')
 
@@ -52,8 +52,9 @@ class RegisterDialog(AnimatedPanel):
 
         self.logo_label.setFixedSize(128, 128)
 
-        self.logo_label.setPixmap(get_pixmap('logo_126px.png'))
-        self.cancel_button.setIcon(get_pixmap('exit_reversed.png'))
+        self.logo_label.setIcon(get_pixmap('logo.png'))
+        self.logo_label.setIconSize(QtCore.QSize(128, 128))
+        self.cancel_button.setIcon(get_pixmap('cancel_reversed.png'))
 
         self.logo_label.setObjectName('LogoLabel')
 

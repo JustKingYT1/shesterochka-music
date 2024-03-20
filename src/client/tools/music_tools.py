@@ -19,8 +19,8 @@ def get_music_in_music_dir(sort: bool = False, my_music_flag: bool=False, user_i
         if not file.tag:
             file.initTag()
 
-        if file.tag.title != 'Unknown' and file.tag.artist != 'Unknown':
-            file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist))
+        # if file.tag.title != 'Unknown' and file.tag.artist != 'Unknown':
+        #     file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist))
 
         file.tag.album = 'Неизвестен' if not file.tag.album else file.tag.album
         file.tag.title = 'Неизвестен' if not file.tag.title else file.tag.title
@@ -29,3 +29,21 @@ def get_music_in_music_dir(sort: bool = False, my_music_flag: bool=False, user_i
         file.tag.save()
 
     return files if not sort else sorted(files, key=lambda x: x.tag.title)
+
+
+def get_music_per_id(id: int) -> None:
+    file = eyed3.load(Music.get(Music.id == id).path)
+
+    if not file.tag:
+            file.initTag()
+
+    if file.tag.title != 'Unknown' and file.tag.artist != 'Unknown':
+        file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist))
+
+    file.tag.album = 'Неизвестен' if not file.tag.album else file.tag.album
+    file.tag.title = 'Неизвестен' if not file.tag.title else file.tag.title
+    file.tag.artist = 'Неизвестен' if not file.tag.artist else file.tag.artist
+    
+    file.tag.save()
+    
+    return file

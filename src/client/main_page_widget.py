@@ -1,9 +1,9 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from eyed3 import AudioFile
-from src.client.tools.music_tools import get_music_in_music_dir
+from src.client.tools.music_tools import get_music_per_id, get_music_in_music_dir
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.animated_panel_widget import AnimatedPanel
-from src.database_models import Music
+from src.database_models import Music, UserPlaylists
 from io import BytesIO
 import settings
 import time
@@ -17,6 +17,8 @@ class TypesMenu(enum.Enum):
 
 
 class MainPageMenu(AnimatedPanel):
+    stop_flag: bool = False
+    add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile,)
     def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu) -> None:
         super(MainPageMenu, self).__init__(parent)
         self.parent = parent
@@ -37,7 +39,7 @@ class MainPageMenu(AnimatedPanel):
 
         set_style_sheet_for_widget(self, 'main_page_menu.qss')
         if self.parent.session.user.id == -1 and self.type is True:
-            self.set_notification('Авторизуйтесь для использования приложения')
+            self.set_notification('Авторизуйтесь для использования своей музыки')
             return
 
         self.main_v_layout.addWidget(self.scroll_area)
@@ -57,8 +59,11 @@ class MainPageMenu(AnimatedPanel):
         self.scroll_widget.setLayout(self.scroll_layout)
         self.scroll_area.setWidget(self.scroll_widget)
 
-        self.load_music()
+        self.add_music_signal.connect(self.load_track)
 
+        self.update_music()
+
+    @QtCore.Slot(AudioFile,)
     def load_track(self, music: AudioFile=None) -> None:
         # Music.create(title=music.tag.title, artist=music.tag.artist, path=music.path)
         new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self.parent, music)
@@ -99,12 +104,10 @@ class MainPageMenu(AnimatedPanel):
             spacer = item.spacerItem()
 
             if widget:
-                widget.deleteLater()
                 layout.removeWidget(widget)
-                del widget
+                widget.deleteLater()
             elif spacer:
                 layout.removeItem(spacer) 
-                del spacer
 
         if not only_clear:
             self.__init_ui()
@@ -112,15 +115,21 @@ class MainPageMenu(AnimatedPanel):
     
     def reload_tracks(self) -> None:
         self.clear_musics()
-        self.load_music()
+        self.update_music()
+    
+    def update_music(self) -> None:
+        threading.Thread(target=self.load_music).start()
     
     def load_music(self) -> None:
-        files: list = get_music_in_music_dir(True, self.type, self.parent.session.user.id if self.type else None)
+        # files = get_music_in_music_dir(True, self.type)
 
-        for file in files:
-            if 'empty.mp3' in file.path:
-                continue
-            self.load_track(music=file)
+        # for file in files:
+        #     self.add_music_signal.emit(file)
+        for id in range(1, Music.select().count() + 1) if not self.type \
+            else [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]:
+            if self.stop_flag:
+                exit()
+            self.add_music_signal.emit(get_music_per_id(id))
 
     def size_expand(self) -> None:
         self.resize(self.parent.width() - 13.5, self.parent.height() - 52.5)
@@ -133,6 +142,7 @@ class MainPageMenu(AnimatedPanel):
     class MusicFrame(QtWidgets.QFrame):
         music: AudioFile
         toggle: bool = False
+        pixmap: QtGui.QPixmap
         def __init__(self, parent: QtWidgets.QWidget, music: AudioFile) -> None:
             super(MainPageMenu.MusicFrame, self).__init__(parent)
             self.parent = parent
@@ -169,10 +179,22 @@ class MainPageMenu(AnimatedPanel):
             if self.music.tag.images:
                 pixmap: QtGui.QPixmap = QtGui.QPixmap()
                 pixmap.loadFromData(BytesIO(self.music.tag.images[0].image_data).getvalue())
+                mask = QtGui.QBitmap(pixmap.size())
+                mask.fill(QtCore.Qt.GlobalColor.color0)
+                painter = QtGui.QPainter(mask)
+                painter.setBrush(QtCore.Qt.GlobalColor.color1)
+                path = QtGui.QPainterPath()
+                radius = 120
+                painter.drawRoundedRect(0, 0, pixmap.width(), pixmap.height(), radius, radius)
+                painter.fillPath(path, QtCore.Qt.GlobalColor.color1)
+                painter.end()
+                pixmap.setMask(mask)
+                self.pixmap = pixmap
                 self.image_label.setPixmap(pixmap)
             
             else:
                 pixmap: QtGui.QPixmap = QtGui.QPixmap(f"{settings.IMG_DIR}/default_track.png")
+                self.pixmap = pixmap
                 self.image_label.setPixmap(pixmap)
 
         def toggle_pressed(self) -> None:
@@ -227,7 +249,7 @@ class MainPageMenu(AnimatedPanel):
                 time.sleep(0.01)
                 self.main_win.change_current_music_widget_style()
                 self.main_win.music_session.setSource(QtCore.QUrl().fromLocalFile(self.music.path), self)
-                self.main_win.music_info_widget.set_music(self.music)
+                self.main_win.music_info_widget.set_music(self)
                 self.main_win.change_state_like_button()
                 self.toggle_pressed()
 
