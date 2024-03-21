@@ -3,14 +3,10 @@ QMainWindow#MainWindow {
     border: 2px solid rgb(40, 40, 40);
 }
 
-MainWindow::title{
-    background-color: #333;
-    color: white;
-}
-
 QMessageBox{
     background-color: rgba(45, 45, 45, 128);
     border: 2px solid rgba(50, 50, 50, 128);
+    color: white;
 }
 
 QMessageBox>QLabel{
