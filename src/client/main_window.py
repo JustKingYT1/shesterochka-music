@@ -8,26 +8,13 @@ from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.main_page_widget import MainPageMenu, TypesMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.client.tools.config_manager import ConfigManager
 from src.client.music_info_widget import MusicInfo
 from src.client.music_session import MusicSession
 from src.client.title_widget import TitleWidget
+from src.client.rounded_corners_widget import RoundedCornersWindow
 import settings
 import eyed3
-
-
-class RoundedCornersWindow(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        painter.setBrush(QtGui.QBrush(QtGui.QColor("#232323")))
-        pen = QtGui.QPen(QtGui.QColor('#282828'))
-        pen.setWidth(4)
-        painter.setPen(pen)
-        painter.drawRoundedRect(self.rect(), 15, 15)  # Радиус закругления углов
-
 
 class MainWindow(QtWidgets.QMainWindow):
     session: Session = Session() # type: ignore
@@ -57,9 +44,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)  
         self.setWindowIcon(get_pixmap('logo'))
+        self.setWindowTitle('Shesterocka Music')
         self.setCentralWidget(self.central_widget)
         self.setObjectName('MainWindow')
+
         set_style_sheet_for_widget(self, 'main_window.qss')
+
+        config = ConfigManager.get_config()
+
+        if config['user']['id'] != -1:
+            self.settings_menu.login_dialog.nickname_line_edit.setText(config['user']['login'])
+            self.settings_menu.login_dialog.password_line_edit.setText(config['user']['password'])
+            self.settings_menu.login_dialog.login_button_clicked(not_message_box=True)
 
         self.title_widget.set_window_title('Shesterocka Music')
         self.title_widget.set_window_icon('logo')
@@ -104,20 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setIcon(QtWidgets.QMessageBox.Icon.Information if not error else QtWidgets.QMessageBox.Icon.Critical)
         message_box.setText(text)
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-        message_box.buttons()[0].setStyleSheet('''
-                                                QPushButton{background-color: rgba(75, 75, 75, 128);
-                                                border-radius: 5px;
-                                                font-size: 10px;
-                                                color: white;}
-                                                
-                                                QPushButton::hover{
-                                                 background-color: rgba(90, 90, 90, 128);
-                                                }
-                                               
-                                                QPushButton::pressed{
-                                                 background-color: rgba(80, 80, 80, 128)
-                                                }
-                                               ''')
+        set_style_sheet_for_widget(message_box, 'message_box.qss')
         message_box.buttons()[0].setFixedSize(60, 20)
         
         message_box.exec()

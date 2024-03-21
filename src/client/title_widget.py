@@ -61,8 +61,6 @@ class TitleWidget(QtWidgets.QFrame):
         self.parent.my_music_menu.stop_flag = True
         exit()
 
-        exit()
-
     def curtail_button_clicked(self) -> None:
         self.parent.showMinimized()
 

@@ -6,10 +6,11 @@ QFrame#SideMenu{
 
 SideButton{
 	background-color: rgb(50, 50, 50);
-	border-radius: 15px;
+	border-radius: 3px;
 }
 
 SideButton::hover{
 	background-color: rgb(70, 70, 70);
+	border-radius: 3px;
 }
 

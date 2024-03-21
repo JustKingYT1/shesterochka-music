@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
+from src.client.tools.config_manager import ConfigManager
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.database_models import UserModel
 
@@ -75,7 +76,7 @@ class LoginDialog(AnimatedPanel):
 
         self.main_v_layout.addWidget(self.login_button, 7, QtCore.Qt.AlignmentFlag.AlignRight | QtCore.Qt.AlignmentFlag.AlignTop)
         
-        self.login_button.clicked.connect(self.register_button_clicked)
+        self.login_button.clicked.connect(self.login_button_clicked)
         self.cancel_button.clicked.connect(self.cancel_button_clicked)
 
     def validate_text_line_edits(self) -> bool:
@@ -85,7 +86,7 @@ class LoginDialog(AnimatedPanel):
             
         return True
 
-    def register_button_clicked(self) -> None:
+    def login_button_clicked(self, not_message_box: bool=False) -> None:
         if not self.validate_text_line_edits():
             self.parent.show_message(text='One or more fields is empty', 
                                      error=True, 
@@ -96,14 +97,15 @@ class LoginDialog(AnimatedPanel):
             nickname=self.nickname_line_edit.text(),
             password=self.password_line_edit.text())
 
-        if self.parent.session.auth:
+        if self.parent.session.auth and not not_message_box:
             self.parent.show_message(text='Succesfully login')
-        else:
+        elif not self.parent.session.auth:
+            self.parent.show_message(text='Incorrect login or password', error=True)
             return
-
+    
         self.parent.settings_menu.authorize_action()
 
         self.cancel_button_clicked()
     
     def cancel_button_clicked(self) -> None:
-        self.parent.widget_switch_animation(self.parent.side_menu.settings_button)
+        self.parent.side_menu.settings_button.click()

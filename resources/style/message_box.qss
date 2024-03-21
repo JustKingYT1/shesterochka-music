@@ -1,0 +1,24 @@
+QMessageBox{
+    background-color: rgba(45, 45, 45, 128);
+    border: 2px solid rgba(50, 50, 50, 128);
+    color: white;
+}
+
+QMessageBox>QLabel{
+    color: white
+}
+
+QPushButton{
+    background-color: rgba(75, 75, 75, 128);
+    border-radius: 5px;
+    font-size: 10px;
+    color: white;
+}
+                                                
+QPushButton::hover{
+    background-color: rgba(90, 90, 90, 128);
+}
+                                               
+QPushButton::pressed{
+    background-color: rgba(80, 80, 80, 128);
+}

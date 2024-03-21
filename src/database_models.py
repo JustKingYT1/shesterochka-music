@@ -33,6 +33,9 @@ class Music(BaseModel):
         database = database
         indexes = ((('title', 'artist'), True),)
 
+class NotLikeMusic(Music):
+    pass
+
 
 class UserPlaylists(BaseModel):
     user_id = peewee.ForeignKeyField(User, backref='Playlists', null=False)
@@ -43,4 +46,4 @@ class UserPlaylists(BaseModel):
         indexes = ((('user_id', 'music_id'), True),)
     
 
-database.create_tables([User, Music, UserPlaylists])
+database.create_tables([User, Music, UserPlaylists, NotLikeMusic])

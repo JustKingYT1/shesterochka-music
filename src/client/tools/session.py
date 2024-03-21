@@ -1,5 +1,6 @@
 from src.database_models import User, UserModel
 import peewee
+from src.client.tools.config_manager import ConfigManager
 
 class Session:
     user: UserModel = UserModel(
@@ -18,7 +19,7 @@ class Session:
                     password=user.password,
                 )
         except peewee.IntegrityError:
-            self.parent.show_message(text='Такое имя уже занято, попробуйте ввести другое', 
+            self.parent.show_message(text='This name is already occupied, try to enter another one', 
                                      error=True, 
                                      parent=self.parent)
             return
@@ -31,6 +32,8 @@ class Session:
             password=new_user.password,
             image_path=new_user.image_path
         )
+        
+        self.update_user_in_config()
 
         self.auth = True
 
@@ -39,10 +42,13 @@ class Session:
         if user:
             self.user = user
             self.auth = True
-        else:
-            self.parent.show_message(text='Неверный логин или пароль', 
-                                    error=True, 
-                                    parent=self.parent)
+            self.update_user_in_config()
+
+    def update_user_in_config(self) -> None:
+        ConfigManager.set_config({'user': {'id': self.user.id, 
+                                    'login': self.user.nickname, 
+                                    'password': self.user.password, 
+                                    'image_path': self.user.image_path}})
 
     def leave(self) -> None:
         self.auth = False
@@ -52,6 +58,8 @@ class Session:
             password='',
             image_path=None
         )
+
+        self.update_user_in_config()
     
     def set_parent(self, parent) -> None:
         self.parent = parent

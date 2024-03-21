@@ -2,6 +2,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.client.tools.config_manager import ConfigManager
 from src.database_models import UserModel
 
 
@@ -118,4 +119,4 @@ class RegisterDialog(AnimatedPanel):
         self.cancel_button_clicked()
     
     def cancel_button_clicked(self) -> None:
-        self.parent.widget_switch_animation(self.parent.side_menu.settings_button)
+        self.parent.side_menu.settings_button.click()
