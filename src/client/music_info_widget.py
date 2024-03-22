@@ -11,6 +11,7 @@ class MusicInfo(MainPageMenu.MusicFrame):
     def __init__(self, parent: QtWidgets.QWidget, music: eyed3.AudioFile) -> None:
         super(MusicInfo, self).__init__(parent, music)
         self.parent = parent
+        self.main_win = parent
         self.__init_ui()
         self.__setting_ui()
         self.show()
@@ -21,7 +22,7 @@ class MusicInfo(MainPageMenu.MusicFrame):
 
     def __setting_ui(self) -> None:
         self.main_h_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        self.main_h_layout.setContentsMargins(5, 0, 5, 0)
+        self.main_h_layout.setContentsMargins(6, 0, 5, 0)
         self.play_button.setContentsMargins(0, 5, 0, 5)
         self.like_button.setContentsMargins(0, 5, 0, 5)
         set_style_sheet_for_widget(self, 'music_info.qss')
@@ -29,6 +30,12 @@ class MusicInfo(MainPageMenu.MusicFrame):
         self.main_h_layout.insertItem(0, QtWidgets.QSpacerItem(30, 0, QtWidgets.QSizePolicy.Policy.Preferred))
         self.main_h_layout.insertItem(self.main_h_layout.count(), QtWidgets.QSpacerItem(self.parent.size().width(), 0, QtWidgets.QSizePolicy.Policy.Preferred))
         self.main_h_layout.addWidget(self.play_button)
+
+        self.setEnabled(False)
+        self.setFixedHeight(47)
+
+        self.title_label.setText(self.title_label.text())
+        self.info_label.hide()
 
         self.play_button.setEnabled(False)
         self.like_button.setEnabled(False)
@@ -59,11 +66,13 @@ class MusicInfo(MainPageMenu.MusicFrame):
     def set_music(self, music_widget: MainPageMenu.MusicFrame) -> None:
         self.play_button.pressed = False
         self.play_button.toggle_pressed()
+        self.setEnabled(True)
         self.change_music(music_widget)
     
     def change_music(self, music_widget: MainPageMenu.MusicFrame) -> None:
         self.title_label.setText(music_widget.music.tag.title)
         self.info_label.setText(f'{music_widget.music.tag.artist} • {music_widget.music.tag.album}')
+        self.info_label.show()
         self.image_label.setPixmap(music_widget.pixmap)
         self.music_widget = music_widget
         self.music = music_widget.music

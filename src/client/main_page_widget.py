@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from eyed3 import AudioFile
 from src.client.tools.music_tools import get_music_per_id, get_music_in_music_dir
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.client.tools.pixmap_tools import get_pixmap
 from src.client.animated_panel_widget import AnimatedPanel
 from src.database_models import Music, UserPlaylists
 from io import BytesIO
@@ -15,32 +16,48 @@ class TypesMenu(enum.Enum):
     MyMusic: bool = True
     MainMusic: bool = False
 
-
 class MainPageMenu(AnimatedPanel):
     stop_flag: bool = False
-    add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile,)
-    def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu) -> None:
+    add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile, int)
+    def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu, instance_id: int) -> None:
         super(MainPageMenu, self).__init__(parent)
         self.parent = parent
+        self.instance_id = instance_id
         self.type = type.value
         self.__init_ui()
         self.__setting_ui()
     
     def __init_ui(self) -> None:
+        self.title_label = QtWidgets.QLabel('<h1>Title</h1>')
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_widget = QtWidgets.QWidget()
         self.scroll_layout = QtWidgets.QVBoxLayout()
-        self.music_list: list = []
+        self.search_widget = MainPageMenu.SearchWidget(self)
+
+        self.music_list: list[MainPageMenu.MusicFrame] = []
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
 
         self.setObjectName('MainPageMenu')
 
+        self.setContentsMargins(-6, 30, -10, 20)
+
         set_style_sheet_for_widget(self, 'main_page_menu.qss')
         if self.parent.session.user.id == -1 and self.type is True:
             self.set_notification('Авторизуйтесь для использования своей музыки')
+            self.search_widget.hide()
             return
+        
+        self.title_label.setText('<h2>Главная</h2>' if not self.type else '<h2>Моя музыка</h2>')
+
+        self.title_label.setObjectName('TitleLabel')
+
+        self.main_v_layout.addWidget(self.title_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.title_label.setFixedWidth(self.parent.height() - 116)
+
+        self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 5))
 
         self.main_v_layout.addWidget(self.scroll_area)
 
@@ -48,6 +65,7 @@ class MainPageMenu(AnimatedPanel):
         self.scroll_area.verticalScrollBar().setMaximumWidth(6)
         self.scroll_area.setContentsMargins(0,0,0,0)
         self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.setObjectName('ScrollArea')
         self.scroll_area.verticalScrollBar().setObjectName('ScrollBar')
 
@@ -63,19 +81,10 @@ class MainPageMenu(AnimatedPanel):
 
         self.update_music()
 
-    @QtCore.Slot(AudioFile,)
-    def load_track(self, music: AudioFile=None) -> None:
-        # Music.create(title=music.tag.title, artist=music.tag.artist, path=music.path)
-        new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self.parent, music)
-        new_music_frame.size_expand()
-        self.scroll_layout.addWidget(new_music_frame)
-        self.music_list.append(new_music_frame)
-    
-    def clear_musics(self) -> None:
-        for music in self.music_list:
-            music.close()
+        self.main_v_layout.addWidget(self.search_widget)
 
-        self.music_list.clear()
+    def set_title(self, title: str) -> None:
+        self.title_label.setText(f'<h1>{title}</h1>')
     
     def set_notification(self, text: str) -> None:
         title = QtWidgets.QLabel()
@@ -97,7 +106,9 @@ class MainPageMenu(AnimatedPanel):
         
     def reload_widget(self, only_clear: bool=False) -> None:
         layout = self.main_v_layout
+
         self.music_list.clear()
+
         while layout.count():
             item = layout.itemAt(0)
             widget = item.widget()
@@ -106,38 +117,94 @@ class MainPageMenu(AnimatedPanel):
             if widget:
                 layout.removeWidget(widget)
                 widget.deleteLater()
-            elif spacer:
-                layout.removeItem(spacer) 
+            if spacer:
+                layout.removeItem(spacer)
 
         if not only_clear:
             self.__init_ui()
             self.__setting_ui()
+
+    def clear_musics(self) -> None:
+        for music in self.music_list:
+            music.close()
+
+        self.music_list.clear()
+
+        for i in reversed(range(self.scroll_layout.count())):
+            item = self.scroll_layout.itemAt(i)
+            if isinstance(item, QtWidgets.QSpacerItem):
+                self.scroll_layout.removeItem(item)
     
     def reload_tracks(self) -> None:
         self.clear_musics()
         self.update_music()
-    
+
+    @QtCore.Slot(AudioFile, int)
+    def load_track(self, music: AudioFile, instance_id: int) -> None:
+        # Music.create(title=music.tag.title, artist=music.tag.artist, path=music.path)
+        if instance_id == self.instance_id:
+            print(instance_id, self.instance_id)
+            new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self, music)
+            new_music_frame.size_expand()
+            self.scroll_layout.addWidget(new_music_frame)
+            self.music_list.append(new_music_frame)
+        
     def update_music(self) -> None:
-        threading.Thread(target=self.load_music).start()
+        thread = threading.Thread(target=self.load_music)
+        thread.start()
+    
     
     def load_music(self) -> None:
-        # files = get_music_in_music_dir(True, self.type)
+        # files = get_music_in_music_dir()
 
-        # for file in files:
+        # for file, _ in files:
         #     self.add_music_signal.emit(file)
         for id in range(1, Music.select().count() + 1) if not self.type \
             else [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]:
             if self.stop_flag:
                 exit()
-            self.add_music_signal.emit(get_music_per_id(id))
+            self.add_music_signal.emit(get_music_per_id(id), self.instance_id)
 
     def size_expand(self) -> None:
-        self.resize(self.parent.width() - 13.5, self.parent.height() - 52.5)
+        self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)
         for music in self.music_list:
             music.size_expand()
     
     class SearchWidget(QtWidgets.QFrame):
-        pass
+        search_text: str = ''
+        def __init__(self, parent: QtWidgets.QWidget) -> None:
+            super().__init__(parent)
+            self.parent = parent
+            self.__init_ui()
+            self.__setting_ui()
+
+        def __init_ui(self) -> None:
+            self.main_h_layout = QtWidgets.QHBoxLayout()
+            self.search_button = QtWidgets.QPushButton()
+            self.search_line_edit = QtWidgets.QLineEdit()
+
+        def __setting_ui(self) -> None:
+            self.setLayout(self.main_h_layout)
+
+            self.setObjectName('SearchWidget')
+
+            self.main_h_layout.setContentsMargins(0, 0, 0, 0)
+
+            self.size_expand()
+            
+            self.search_button.setIcon(get_pixmap('search.png'))
+            self.search_button.setIconSize(QtCore.QSize(28, 28))
+
+            self.main_h_layout.setContentsMargins(3, 3, 3, 3)
+            self.main_h_layout.addWidget(self.search_button)
+            self.main_h_layout.addWidget(self.search_line_edit)
+        
+        def size_expand(self) -> None:
+            self.setFixedWidth(self.parent.parent.width() - 274)
+
+            self.search_line_edit.setFixedHeight(28)
+
+            self.search_button.setFixedSize(28, 28)
         
     class MusicFrame(QtWidgets.QFrame):
         music: AudioFile
@@ -147,7 +214,7 @@ class MainPageMenu(AnimatedPanel):
             super(MainPageMenu.MusicFrame, self).__init__(parent)
             self.parent = parent
             self.music = music
-            self.main_win = self.parent
+            self.main_win = self.parent.parent
 
             self.__init_ui()
             self.__setting_ui()
@@ -241,11 +308,11 @@ class MainPageMenu(AnimatedPanel):
                 self.pause()
             else:
                 self.play()
-            
         
         def set_audio(self) -> None:
             if not self.main_win.music_session.current_music or self.main_win.music_session.current_music.path != self.music.path:
                 self.stop()
+                self.parent.button.click()
                 time.sleep(0.01)
                 self.main_win.change_current_music_widget_style()
                 self.main_win.music_session.setSource(QtCore.QUrl().fromLocalFile(self.music.path), self)
@@ -254,4 +321,4 @@ class MainPageMenu(AnimatedPanel):
                 self.toggle_pressed()
 
         def size_expand(self) -> None:
-            self.setFixedWidth(self.parent.width() - 42)
+            self.setFixedWidth(self.main_win.width() - 37)

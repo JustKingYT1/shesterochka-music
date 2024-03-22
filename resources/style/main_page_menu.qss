@@ -52,13 +52,28 @@ QPushButton#ToSettingsButton::pressed{
     background-color: rgba(65, 65, 65, 128);
 }
 
+QFrame#SearchWidget{
+    background-color: rgb(55, 55, 55);
+    border-radius: 10px;
+}
+
+QFrame#SearchWidget>QPushButton{
+    background-color: rgba(35, 35, 35, 8);
+    border-radius: 5px;
+}
+
+QFrame#SearchWidget>QLineEdit{
+    background-color: rgb(65, 65, 65);
+    border-radius: 5px;
+}
+
 QFrame#MusicFrame{
-    background-color: rgba(70, 70, 70, 128);
+    background-color: rgba(70, 70, 70, 86);
     border-radius: 7px;
 }
 
 QFrame#MusicFrame::hover{
-    background-color: rgba(85, 85, 85, 128);
+    background-color: rgba(95, 95, 95, 86);
 }
 
 QFrame#MusicFrame>QLabel{
@@ -66,7 +81,12 @@ QFrame#MusicFrame>QLabel{
 }
 
 QFrame#MusicFrame>QLabel#InfoLabel{
-    color: rgba(200, 200, 200, 128);
+    color: rgb(150, 150, 150);
+}
+
+QFrame#MainPageMenu>QLabel#TitleLabel{
+    background-color: rgba(60, 60, 60, 128);
+    text-align: center;
 }
 
 QLabel{color: white;}

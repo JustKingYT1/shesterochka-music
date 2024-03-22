@@ -35,8 +35,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logo_label = QtWidgets.QPushButton()
         self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
-        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)
-        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic)
+        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic, 0)   
+        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic, 1)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.timer = QtCore.QTimer(self)
 
@@ -47,15 +47,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle('Shesterocka Music')
         self.setCentralWidget(self.central_widget)
         self.setObjectName('MainWindow')
+        
+        self.main_page_menu.update_music()
+        self.my_music_menu.update_music()
 
         set_style_sheet_for_widget(self, 'main_window.qss')
 
-        config = ConfigManager.get_config()
-
-        if config['user']['id'] != -1:
-            self.settings_menu.login_dialog.nickname_line_edit.setText(config['user']['login'])
-            self.settings_menu.login_dialog.password_line_edit.setText(config['user']['password'])
-            self.settings_menu.login_dialog.login_button_clicked(not_message_box=True)
+        self.set_user()
 
         self.title_widget.set_window_title('Shesterocka Music')
         self.title_widget.set_window_icon('logo')
@@ -75,15 +73,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.container_layout.addSpacing(70)
 
         self.logo_label.setFixedSize(QtCore.QSize(168, 168))
-        self.logo_label.setIcon(get_pixmap('logo1'))
+
+        pixmap = get_pixmap('logo1')
+
+        self.logo_label.setIcon(pixmap)
         self.logo_label.setIconSize(QtCore.QSize(168, 168))
 
         self.side_menu.main_page_button.set_widget(self.main_page_menu)
         self.side_menu.my_music_button.set_widget(self.my_music_menu)
         self.side_menu.settings_button.set_widget(self.settings_menu)
-
-        self.main_page_menu.size_expand()
-        self.settings_menu.size_expand()
 
         self.main_page_menu.set_button(self.side_menu.main_page_button)
         self.my_music_menu.set_button(self.side_menu.my_music_button)
@@ -93,7 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.container_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)
         self.container_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.button_clicked(button))
-
+    
     def show_message(self, text: str, parent=None, error: bool=False):
         message_box = QtWidgets.QMessageBox(parent if parent else self)
         message_box.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
@@ -105,6 +103,13 @@ class MainWindow(QtWidgets.QMainWindow):
         
         message_box.exec()
     
+    def set_user(self) -> None:
+        config = ConfigManager.get_config()
+
+        if config['user']['id'] != -1:
+            self.settings_menu.login_dialog.nickname_line_edit.setText(config['user']['login'])
+            self.settings_menu.login_dialog.password_line_edit.setText(config['user']['password'])
+            self.settings_menu.login_dialog.login_button_clicked(not_message_box=True)
 
     def change_current_music_widget_style(self) -> None:
         if not self.music_session.hasAudio():

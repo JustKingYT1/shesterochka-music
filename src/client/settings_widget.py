@@ -22,6 +22,7 @@ class SettingsMenu(AnimatedPanel):
         self.exit_button = QtWidgets.QToolButton()
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
         self.user_profile_layout = QtWidgets.QVBoxLayout()
+        self.user_profile_widget = QtWidgets.QWidget()
         self.register_dialog = RegisterDialog(self.parent)
         self.login_dialog = LoginDialog(self.parent)
         self.spacer = QtWidgets.QSpacerItem(0, 100)
@@ -34,7 +35,7 @@ class SettingsMenu(AnimatedPanel):
         self.setLayout(self.main_v_layout)
         self.main_v_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setObjectName('SettingsMenu')
-        self.main_v_layout.setContentsMargins(10, 10, 10, 10)
+        self.main_v_layout.setContentsMargins(5, 5, 5, 5)
         set_style_sheet_for_widget(self, 'settings_menu.qss')
 
         self.main_v_layout.addWidget(self.scroll_area)
@@ -72,13 +73,17 @@ class SettingsMenu(AnimatedPanel):
 
         self.scroll_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
 
-        self.user_profile_layout.addWidget(self.user_image_label)
+        self.user_profile_layout.addWidget(self.user_image_label, 0)
         
-        self.user_profile_layout.addWidget(self.user_nickname_label)
+        self.user_profile_layout.addWidget(self.user_nickname_label, 1, QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.user_profile_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
-        self.scroll_layout.addLayout(self.user_profile_layout)
+        self.user_profile_widget.setLayout(self.user_profile_layout)
+
+        self.user_profile_widget.setObjectName('UserProfileWidget')
+
+        self.scroll_layout.addWidget(self.user_profile_widget)
 
         self.scroll_layout.addSpacing(120)
 
@@ -119,10 +124,9 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.show()
         self.exit_button.hide()
         self.main_v_layout.removeItem(self.spacer)
-        self.parent.main_page_menu.reload_widget()
         self.parent.my_music_menu.reload_widget()
         self.parent.music_info_widget.like_button.pressed = False
         self.parent.music_info_widget.like_button.toggle_pressed()
 
-        self.start_animation()
+        self.parent.widget_switch_animation(self.button)
         self.size_expand()

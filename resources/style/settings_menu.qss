@@ -1,5 +1,5 @@
 QFrame#SettingsMenu{
-    background-color: rgba(35, 35, 35, 128);
+    background-color: rgba(55, 55, 55, 64);
     border-radius: 10px;
     border: 2px solid rgba(40, 40, 40, 128)
 }
@@ -38,6 +38,12 @@ QLabel#RegisterLabel{
 
 QLabel#RegisterLabel::hover{
     color: rgba(100, 100, 100, 128);
+}
+
+QWidget#UserProfileWidget{
+    background-color: rgba(55, 55, 55, 64);
+    border-radius: 10px;
+    border: 2px solid rgba(70, 70, 70, 128)
 }
 
 QToolButton{

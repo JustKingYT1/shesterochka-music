@@ -4,6 +4,10 @@ MusicInfo{
     border: 2px solid #535353;
 }
 
+QFrame#MusicFrame>QLabel#InfoLabel{
+    color: rgb(150, 150, 150)
+}
+
 QLabel{
     color: white;
 }
