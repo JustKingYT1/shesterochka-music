@@ -8,7 +8,7 @@ import eyed3
 from src.database_models import Music
 
 
-def get_music_in_music_dir(sort: bool = False):
+def fill_database(sort: bool = False):
     files = [(eyed3.load(f'{settings.MUSIC_DIR}/{file}'), file) \
             for file in os.listdir(settings.MUSIC_DIR) \
             if file.endswith('.mp3') and file != 'empty.mp3'] 
@@ -23,7 +23,7 @@ def get_music_in_music_dir(sort: bool = False):
             
             file.tag.save()
         
-    return files
+        Music.create(title=file.tag.title, path=file.path, artist=file.tag.artist)
 
 
 def get_music_per_id(id: int) -> None:

@@ -1,10 +1,10 @@
 from PySide6 import QtWidgets, QtCore, QtGui
+import threading
 
 
 class AnimatedPanel(QtWidgets.QFrame):
     is_opened: bool = False
     button: QtWidgets.QPushButton = None
-    main_v_layout: QtWidgets.QVBoxLayout = None
     animation_pos: QtCore.QPropertyAnimation = None
     animation_size: QtCore.QPropertyAnimation = None
     def __init__(self, parent: QtWidgets.QWidget) -> None:

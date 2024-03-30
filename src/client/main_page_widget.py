@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from eyed3 import AudioFile
-from src.client.tools.music_tools import get_music_per_id, get_music_in_music_dir
+from src.client.tools.music_tools import get_music_per_id, fill_database
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.animated_panel_widget import AnimatedPanel
@@ -18,23 +18,26 @@ class TypesMenu(enum.Enum):
 
 class MainPageMenu(AnimatedPanel):
     stop_flag: bool = False
-    add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile, int)
-    def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu, instance_id: int) -> None:
+    add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile,)
+    remove_music_signal: QtCore.Signal = QtCore.Signal(QtWidgets.QLayout, QtCore.QObject,)
+    def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu) -> None:
         super(MainPageMenu, self).__init__(parent)
         self.parent = parent
-        self.instance_id = instance_id
         self.type = type.value
         self.__init_ui()
         self.__setting_ui()
+        self.add_music_signal.connect(self.load_track)
+        self.remove_music_signal.connect(self.remove_track)
     
     def __init_ui(self) -> None:
-        self.title_label = QtWidgets.QLabel('<h1>Title</h1>')
+        self.title_label = QtWidgets.QLabel()
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_widget = QtWidgets.QWidget()
         self.scroll_layout = QtWidgets.QVBoxLayout()
         self.search_widget = MainPageMenu.SearchWidget(self)
 
         self.music_list: list[MainPageMenu.MusicFrame] = []
+        self.update_thread: threading.Thread = None
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
@@ -55,7 +58,7 @@ class MainPageMenu(AnimatedPanel):
 
         self.main_v_layout.addWidget(self.title_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        self.title_label.setFixedWidth(self.parent.height() - 116)
+        self.title_label.setFixedWidth(self.parent.height() - 187)
 
         self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 5))
 
@@ -76,10 +79,6 @@ class MainPageMenu(AnimatedPanel):
 
         self.scroll_widget.setLayout(self.scroll_layout)
         self.scroll_area.setWidget(self.scroll_widget)
-
-        self.add_music_signal.connect(self.load_track)
-
-        self.update_music()
 
         self.main_v_layout.addWidget(self.search_widget)
 
@@ -104,71 +103,50 @@ class MainPageMenu(AnimatedPanel):
         self.main_v_layout.addItem(QtWidgets.QSpacerItem(0, self.width() // 2 + 40, QtWidgets.QSizePolicy.Policy.Expanding,\
                                                          QtWidgets.QSizePolicy.Policy.Expanding))
         
-    def reload_widget(self, only_clear: bool=False) -> None:
-        layout = self.main_v_layout
-
-        self.music_list.clear()
-
+    def reload_widget(self, layout: QtWidgets.QVBoxLayout, only_clear: bool=False) -> None:
         while layout.count():
             item = layout.itemAt(0)
             widget = item.widget()
             spacer = item.spacerItem()
 
             if widget:
-                layout.removeWidget(widget)
-                widget.deleteLater()
-            if spacer:
-                layout.removeItem(spacer)
+                self.remove_music_signal.emit(layout, widget)
+            elif spacer: 
+                self.remove_music_signal.emit(layout, spacer)
 
         if not only_clear:
             self.__init_ui()
             self.__setting_ui()
 
-    def clear_musics(self) -> None:
-        for music in self.music_list:
-            music.close()
+    @QtCore.Slot(AudioFile,)
+    def load_track(self, music: AudioFile) -> None:
+        new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self, music)
+        new_music_frame.size_expand()
+        self.scroll_layout.addWidget(new_music_frame)
 
-        self.music_list.clear()
-
-        for i in reversed(range(self.scroll_layout.count())):
-            item = self.scroll_layout.itemAt(i)
-            if isinstance(item, QtWidgets.QSpacerItem):
-                self.scroll_layout.removeItem(item)
-    
-    def reload_tracks(self) -> None:
-        self.clear_musics()
-        self.update_music()
-
-    @QtCore.Slot(AudioFile, int)
-    def load_track(self, music: AudioFile, instance_id: int) -> None:
-        # Music.create(title=music.tag.title, artist=music.tag.artist, path=music.path)
-        if instance_id == self.instance_id:
-            print(instance_id, self.instance_id)
-            new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self, music)
-            new_music_frame.size_expand()
-            self.scroll_layout.addWidget(new_music_frame)
-            self.music_list.append(new_music_frame)
+    @QtCore.Slot(QtWidgets.QLayout, QtCore.QObject,)
+    def remove_track(self, layout: QtWidgets.QLayout, item: QtCore.QObject) -> None:
+        layout.removeWidget(item) if isinstance(item, QtWidgets.QWidget) else layout.removeItem(item)
+        item.deleteLater() if isinstance(item, QtWidgets.QWidget) else None
+        item.close() if isinstance(item, MainPageMenu.MusicFrame) else None
         
-    def update_music(self) -> None:
-        thread = threading.Thread(target=self.load_music)
-        thread.start()
-    
-    
-    def load_music(self) -> None:
-        # files = get_music_in_music_dir()
+    def update_music(self, reload: bool = False) -> None:
+        self.update_thread = threading.Thread(target=self.load_music, args=[reload,])
+        self.update_thread.start()
 
-        # for file, _ in files:
-        #     self.add_music_signal.emit(file)
+    def load_music(self, reload: bool = False) -> None:
+        if reload:
+            self.reload_widget(self.scroll_layout, reload)
+        if Music.select().count() == 0:
+            fill_database()
         for id in range(1, Music.select().count() + 1) if not self.type \
             else [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]:
             if self.stop_flag:
                 exit()
-            self.add_music_signal.emit(get_music_per_id(id), self.instance_id)
+            self.add_music_signal.emit(get_music_per_id(id))
 
     def size_expand(self) -> None:
         self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)
-        for music in self.music_list:
-            music.size_expand()
     
     class SearchWidget(QtWidgets.QFrame):
         search_text: str = ''
@@ -189,8 +167,6 @@ class MainPageMenu(AnimatedPanel):
             self.setObjectName('SearchWidget')
 
             self.main_h_layout.setContentsMargins(0, 0, 0, 0)
-
-            self.size_expand()
             
             self.search_button.setIcon(get_pixmap('search.png'))
             self.search_button.setIconSize(QtCore.QSize(28, 28))
@@ -198,11 +174,13 @@ class MainPageMenu(AnimatedPanel):
             self.main_h_layout.setContentsMargins(3, 3, 3, 3)
             self.main_h_layout.addWidget(self.search_button)
             self.main_h_layout.addWidget(self.search_line_edit)
+
+            self.size_expand()
         
         def size_expand(self) -> None:
-            self.setFixedWidth(self.parent.parent.width() - 274)
-
-            self.search_line_edit.setFixedHeight(28)
+            self.setFixedWidth(self.parent.parent.width() - 34)
+            
+            self.search_line_edit.setFixedHeight(26.5)
 
             self.search_button.setFixedSize(28, 28)
         

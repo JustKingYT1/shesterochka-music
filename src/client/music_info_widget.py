@@ -50,7 +50,7 @@ class MusicInfo(MainPageMenu.MusicFrame):
             UserPlaylists.get((UserPlaylists.user_id==self.parent.session.user.id) & (UserPlaylists.music_id == self.music.tag.id)).delete_instance()
         
         self.like_button.toggle_pressed()
-        self.parent.my_music_menu.reload_tracks()
+        self.parent.my_music_menu.update_music(True)
 
     def like_button_clicked(self) -> None:
         if self.parent.session.user.id == -1:

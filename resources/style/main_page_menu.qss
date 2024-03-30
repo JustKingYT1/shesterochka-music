@@ -35,7 +35,7 @@ QLabel#TitleLabel{
     padding: 10px;
     color: white;
     background-color: rgba(55, 55, 55, 128);
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 QPushButton#ToSettingsButton{
@@ -69,7 +69,7 @@ QFrame#SearchWidget>QLineEdit{
 
 QFrame#MusicFrame{
     background-color: rgba(70, 70, 70, 86);
-    border-radius: 7px;
+    border-radius: 10px;
 }
 
 QFrame#MusicFrame::hover{

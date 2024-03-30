@@ -22,7 +22,6 @@ class SettingsMenu(AnimatedPanel):
         self.exit_button = QtWidgets.QToolButton()
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
         self.user_profile_layout = QtWidgets.QVBoxLayout()
-        self.user_profile_widget = QtWidgets.QWidget()
         self.register_dialog = RegisterDialog(self.parent)
         self.login_dialog = LoginDialog(self.parent)
         self.spacer = QtWidgets.QSpacerItem(0, 100)
@@ -41,7 +40,7 @@ class SettingsMenu(AnimatedPanel):
         self.main_v_layout.addWidget(self.scroll_area)
 
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setContentsMargins(0,0,0,0)
+        self.scroll_area.setContentsMargins(0, 0, 0, 0)
 
         self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.verticalScrollBar().setMaximumWidth(0)
@@ -79,11 +78,7 @@ class SettingsMenu(AnimatedPanel):
 
         self.user_profile_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
 
-        self.user_profile_widget.setLayout(self.user_profile_layout)
-
-        self.user_profile_widget.setObjectName('UserProfileWidget')
-
-        self.scroll_layout.addWidget(self.user_profile_widget)
+        self.scroll_layout.addLayout(self.user_profile_layout)
 
         self.scroll_layout.addSpacing(120)
 
@@ -111,7 +106,11 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.hide()
         self.exit_button.show()
         self.main_v_layout.addSpacerItem(self.spacer)
-        self.parent.my_music_menu.reload_widget()
+
+        self.parent.main_page_menu.update_music(True)
+        self.parent.my_music_menu.reload_widget(self.parent.my_music_menu.main_v_layout)
+        self.parent.my_music_menu.update_music(True)
+
         self.size_expand()
 
     def exit_button_clicked(self) -> None:
@@ -124,7 +123,10 @@ class SettingsMenu(AnimatedPanel):
         self.register_label.show()
         self.exit_button.hide()
         self.main_v_layout.removeItem(self.spacer)
-        self.parent.my_music_menu.reload_widget()
+
+        self.parent.main_page_menu.update_music(True)
+        self.parent.my_music_menu.reload_widget(self.parent.my_music_menu.main_v_layout)
+
         self.parent.music_info_widget.like_button.pressed = False
         self.parent.music_info_widget.like_button.toggle_pressed()
 

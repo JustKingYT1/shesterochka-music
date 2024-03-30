@@ -22,6 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
     opened_widget: AnimatedPanel = None
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
+        self.setFixedSize(400, 550)
         self.__init_ui()
         self.__setting_ui()
         self.show()
@@ -35,8 +36,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logo_label = QtWidgets.QPushButton()
         self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
-        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic, 0)   
-        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic, 1)
+        self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)   
+        self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.timer = QtCore.QTimer(self)
 
@@ -48,10 +49,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.setObjectName('MainWindow')
         
-        self.main_page_menu.update_music()
-        self.my_music_menu.update_music()
-
         set_style_sheet_for_widget(self, 'main_window.qss')
+
+        # self.main_page_menu.update_music(True)
 
         self.set_user()
 
@@ -59,7 +59,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.title_widget.set_window_icon('logo')
 
         self.central_widget.setLayout(self.main_v_layout)
-        self.setFixedSize(400, 550)
         self.session.set_parent(self)
 
         self.main_v_layout.addWidget(self.title_widget) 

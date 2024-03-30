@@ -1,5 +1,5 @@
 QFrame#SettingsMenu{
-    background-color: rgba(55, 55, 55, 64);
+    background-color: rgba(35, 35, 35, 128);
     border-radius: 10px;
     border: 2px solid rgba(40, 40, 40, 128)
 }
