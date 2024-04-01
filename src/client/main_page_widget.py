@@ -131,19 +131,33 @@ class MainPageMenu(AnimatedPanel):
         item.close() if isinstance(item, MainPageMenu.MusicFrame) else None
         
     def update_music(self, reload: bool = False) -> None:
+        if self.update_thread:
+            self.update_thread.join()
         self.update_thread = threading.Thread(target=self.load_music, args=[reload,])
         self.update_thread.start()
 
     def load_music(self, reload: bool = False) -> None:
+        list_musics: list | bool = self.search_widget.search_musics()
+        flag = False if list_musics else True
         if reload:
-            self.reload_widget(self.scroll_layout, reload)
+            self.reload_widget(self.scroll_layout, True)
         if Music.select().count() == 0:
             fill_database()
         for id in range(1, Music.select().count() + 1) if not self.type \
             else [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]:
             if self.stop_flag:
                 exit()
-            self.add_music_signal.emit(get_music_per_id(id))
+
+            music: AudioFile = get_music_per_id(id)
+
+            if list_musics and len(list_musics) > 0:
+                for title in list_musics:
+                    if title == music.tag.title:
+                        flag = True
+                        break
+                
+            self.add_music_signal.emit(music) if flag else None
+            flag = False if list_musics else True
 
     def size_expand(self) -> None:
         self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)
@@ -175,6 +189,10 @@ class MainPageMenu(AnimatedPanel):
             self.main_h_layout.addWidget(self.search_button)
             self.main_h_layout.addWidget(self.search_line_edit)
 
+            self.search_line_edit.textChanged.connect(self.set_search_text)
+
+            self.search_button.clicked.connect(lambda: self.parent.update_music(True))
+
             self.size_expand()
         
         def size_expand(self) -> None:
@@ -183,6 +201,28 @@ class MainPageMenu(AnimatedPanel):
             self.search_line_edit.setFixedHeight(26.5)
 
             self.search_button.setFixedSize(28, 28)
+        
+        def set_search_text(self) -> None:
+            self.search_text = self.search_line_edit.text()
+            if self.search_text == '':
+                self.search_button.click()
+        
+        def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+            if event.key() == QtCore.Qt.Key.Key_Return.numerator:
+                self.search_button.click()
+
+        def search_musics(self) -> list | None:
+            layout: QtWidgets.QLayout = self.parent.scroll_layout
+            list_musics: list[MainPageMenu.MusicFrame] = []
+            for i in range(0, layout.count()):
+                item = layout.itemAt(i)
+                widget = item.widget()
+
+                if widget:
+                    if self.search_text.lower() in widget.title_label.text().lower() and self.search_text != '':
+                        list_musics.append(widget.title_label.text())
+
+            return None if not len(list_musics) > 0 and self.search_text == '' else list_musics
         
     class MusicFrame(QtWidgets.QFrame):
         music: AudioFile

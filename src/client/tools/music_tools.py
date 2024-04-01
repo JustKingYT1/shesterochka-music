@@ -26,7 +26,7 @@ def fill_database(sort: bool = False):
         Music.create(title=file.tag.title, path=file.path, artist=file.tag.artist)
 
 
-def get_music_per_id(id: int) -> None:
+def get_music_per_id(id: int) -> eyed3.AudioFile:
     model = Music.get(Music.id == id)
     file = eyed3.load(model.path)
 

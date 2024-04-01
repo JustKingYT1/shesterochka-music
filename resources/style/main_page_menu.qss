@@ -65,6 +65,7 @@ QFrame#SearchWidget>QPushButton{
 QFrame#SearchWidget>QLineEdit{
     background-color: rgb(65, 65, 65);
     border-radius: 5px;
+    color: white;
 }
 
 QFrame#MusicFrame{
