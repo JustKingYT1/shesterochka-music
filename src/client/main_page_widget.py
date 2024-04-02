@@ -103,8 +103,8 @@ class MainPageMenu(AnimatedPanel):
         self.main_v_layout.addItem(QtWidgets.QSpacerItem(0, self.width() // 2 + 40, QtWidgets.QSizePolicy.Policy.Expanding,\
                                                          QtWidgets.QSizePolicy.Policy.Expanding))
         
-    def reload_widget(self, layout: QtWidgets.QVBoxLayout, only_clear: bool=False) -> None:
-        while layout.count():
+    def reload_widget(self, layout: QtWidgets.QVBoxLayout, only_clear: bool=False) -> None: # TODO
+        while layout.count(): # Заменить способ удаления или хранения музыки
             item = layout.itemAt(0)
             widget = item.widget()
             spacer = item.spacerItem()
