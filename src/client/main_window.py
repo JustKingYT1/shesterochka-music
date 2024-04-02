@@ -13,6 +13,7 @@ from src.client.music_info_widget import MusicInfo
 from src.client.music_session import MusicSession
 from src.client.title_widget import TitleWidget
 from src.client.rounded_corners_widget import RoundedCornersWindow
+from src.client.current_music_widget import CurrentMusicWidget
 import settings
 import eyed3
 
@@ -39,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)   
         self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
+        self.current_music_widget = CurrentMusicWidget(self)
         self.timer = QtCore.QTimer(self)
 
     def __setting_ui(self) -> None:
@@ -89,6 +91,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.container_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.container_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)
         self.container_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
+
+        self.music_info_widget.mousePressEvent = self.musicInfoMousePressEvent
+
         self.side_menu.group_buttons.buttonClicked.connect(lambda button: self.button_clicked(button))
     
     def show_message(self, text: str, parent=None, error: bool=False):
@@ -131,10 +136,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.opened_widget != (widget if not button else button.widget):
                 self.start_widget_animation(self.opened_widget)
                 self.timer.singleShot(320, lambda button=button: self.on_timer_finished(button.widget if button else widget))
-            elif self.opened_widget == button.widget:
-                self.start_widget_animation(button.widget)
+            elif self.opened_widget == (button.widget if button else widget):
+                self.start_widget_animation(button.widget if button else widget)
         else:
-            self.start_widget_animation(button.widget)
+            self.start_widget_animation(button.widget if button else widget)
     
     def start_widget_animation(self, widget: AnimatedPanel) -> None:
         if widget.button:
@@ -148,6 +153,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def button_clicked(self, button) -> None:
         self.widget_switch_animation(button)
+
+    def musicInfoMousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        self.widget_switch_animation(widget=self.current_music_widget)
     
 
 if __name__ == "__main__":

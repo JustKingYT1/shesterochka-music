@@ -180,8 +180,6 @@ class MainPageMenu(AnimatedPanel):
 
             self.setObjectName('SearchWidget')
 
-            self.main_h_layout.setContentsMargins(0, 0, 0, 0)
-            
             self.search_button.setIcon(get_pixmap('search.png'))
             self.search_button.setIconSize(QtCore.QSize(28, 28))
 
