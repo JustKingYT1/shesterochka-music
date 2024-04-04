@@ -1,7 +1,7 @@
 QFrame#CurrentMusicWidget{
-    background-color: rgba(35, 35, 35, 168);
+    background-color: rgba(35, 35, 35, 220);
     border-radius: 10px;
-    border: 2px solid rgba(40, 40, 40, 168);
+    border: 2px solid rgba(40, 40, 40, 220);
 }
 
 QFrame#ToolsWidget{
@@ -16,7 +16,7 @@ QLabel{
 
 
 SideButton{
-    background-color: rgba(35, 35, 35, 168);
+    background-color: rgba(35, 35, 35, 220);
     border-radius: 3px;
 }
 
@@ -32,12 +32,12 @@ QFrame#ToolsWidget>SideButton::hover{
 }
 
 SideButton#HideButton{
-    background-color: rgba(35, 35, 35, 168);
+    background-color: rgba(35, 35, 35, 220);
     border-radius: 3px;
 }
 
 SideButton#HideButton::hover{
-    background-color: rgba(50, 50, 50, 168);
+    background-color: rgba(50, 50, 50, 220);
 }
 
 

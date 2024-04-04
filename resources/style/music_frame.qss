@@ -1,0 +1,16 @@
+QFrame#MusicFrame{
+    background-color: rgba(70, 70, 70, 86);
+    border-radius: 10px;
+}
+
+QFrame#MusicFrame::hover{
+    background-color: rgba(95, 95, 95, 86);
+}
+
+QFrame#MusicFrame>QLabel{
+    color: white;
+}
+
+QFrame#MusicFrame>QLabel#InfoLabel{
+    color: rgb(150, 150, 150);
+}

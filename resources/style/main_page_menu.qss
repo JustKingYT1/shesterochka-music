@@ -4,6 +4,11 @@ QFrame#MainPageMenu{
     border: 2px solid rgba(40, 40, 40, 128);
 }
 
+QFrame#MainPageMenu>QLabel#TitleLabel{
+    background-color: rgba(60, 60, 60, 128);
+    text-align: center;
+}
+
 QFrame#ScrollFrame,
 QWidget#ScrollWidget,
 QScrollArea#ScrollArea{
@@ -66,28 +71,6 @@ QFrame#SearchWidget>QLineEdit{
     background-color: rgb(65, 65, 65);
     border-radius: 5px;
     color: white;
-}
-
-QFrame#MusicFrame{
-    background-color: rgba(70, 70, 70, 86);
-    border-radius: 10px;
-}
-
-QFrame#MusicFrame::hover{
-    background-color: rgba(95, 95, 95, 86);
-}
-
-QFrame#MusicFrame>QLabel{
-    color: white;
-}
-
-QFrame#MusicFrame>QLabel#InfoLabel{
-    color: rgb(150, 150, 150);
-}
-
-QFrame#MainPageMenu>QLabel#TitleLabel{
-    background-color: rgba(60, 60, 60, 128);
-    text-align: center;
 }
 
 QLabel{color: white;}

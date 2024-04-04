@@ -123,10 +123,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.music_session.widget.toggle:
                 self.music_session.widget.toggle_pressed()
     
-    def change_state_like_button(self) -> None:
-        if not self.music_info_widget.like_button.pressed:
-            self.music_info_widget.like_button.toggle_pressed()
-        self.music_info_widget.like_button.toggle_pressed() if UserPlaylists.get_or_none((UserPlaylists.user_id==self.session.user.id) & \
+    def change_state_like_button(self, widget: QtWidgets.QWidget) -> None:
+        if not widget.like_button.pressed:
+            widget.like_button.toggle_pressed()
+        widget.like_button.toggle_pressed() if UserPlaylists.get_or_none((UserPlaylists.user_id==self.session.user.id) & \
                                                                 (UserPlaylists.music_id == self.music_info_widget.music.tag.id)) else None
 
     def widget_switch_animation(self, button=None, widget=None) -> None:

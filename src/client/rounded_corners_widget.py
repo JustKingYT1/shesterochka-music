@@ -3,7 +3,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 class RoundedCornersWindow(QtWidgets.QWidget):
     def __init__(self):
-        super().__init__()
+        super(RoundedCornersWindow, self).__init__()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)

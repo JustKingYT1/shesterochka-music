@@ -5,7 +5,7 @@ from src.client.tools.style_setter import set_style_sheet_for_widget
 
 class TitleWidget(QtWidgets.QFrame):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
-        super().__init__(parent)
+        super(TitleWidget, self).__init__(parent)
         self.parent = parent
         self.__init_ui()
         self.__setting_ui()

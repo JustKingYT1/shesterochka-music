@@ -36,8 +36,8 @@ class MainPageMenu(AnimatedPanel):
         self.scroll_layout = QtWidgets.QVBoxLayout()
         self.search_widget = MainPageMenu.SearchWidget(self)
 
-        self.music_list: list[MainPageMenu.MusicFrame] = []
         self.update_thread: threading.Thread = None
+        self.num = 1
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
@@ -122,7 +122,28 @@ class MainPageMenu(AnimatedPanel):
     def load_track(self, music: AudioFile) -> None:
         new_music_frame: MainPageMenu.MusicFrame = MainPageMenu.MusicFrame(self, music)
         new_music_frame.size_expand()
+        new_music_frame.setObjectName(f'MusicFrame-{self.num}')
+        new_music_frame.setStyleSheet(f'''
+            
+            QFrame#MusicFrame-{self.num}{{
+                background-color: rgba(70, 70, 70, 86);
+                border-radius: 10px;
+            }}
+
+            QFrame#MusicFrame-{self.num}::hover{{
+                background-color: rgba(95, 95, 95, 86);
+            }}
+
+            QFrame#MusicFrame-{self.num}>QLabel{{
+                color: white;
+            }}
+
+            QFrame#MusicFrame-{self.num}s>QLabel#InfoLabel{{
+                color: rgb(150, 150, 150);
+            }}
+        ''')
         self.scroll_layout.addWidget(new_music_frame)
+        self.num += 1
 
     @QtCore.Slot(QtWidgets.QLayout, QtCore.QObject,)
     def remove_track(self, layout: QtWidgets.QLayout, item: QtCore.QObject) -> None:
@@ -281,59 +302,68 @@ class MainPageMenu(AnimatedPanel):
                 self.image_label.setPixmap(pixmap)
 
         def toggle_pressed(self) -> None:
-            if not self.toggle:
-                self.setStyleSheet('''  
-                        QFrame#MusicFrame{
-                            background-color: rgba(95, 95, 95, 128);
-                        }
-                                   
-                        QFrame#MusicFrame::hover{
-                            background-color: rgba(55, 55, 55, 128);
-                        }
-                    ''')
-            else:
-                self.setStyleSheet('''  
-                        QFrame#MusicFrame{
-                            background-color: rgba(70, 70, 70, 128);
-                        }
-                                   
-                        QFrame#MusicFrame::hover{
-                            background-color: rgba(85, 85, 85, 128);
-                        }
-                    ''')
-                
-            self.toggle = not self.toggle
+            if not self.isAncestorOf(self):
+                if not self.toggle:
+                    self.setStyleSheet(f'''  
+                            QFrame#MusicFrame-{self.objectName().split('-')[1]}{{
+                                background-color: rgba(95, 95, 95, 86);
+                                border-radius: 10px;
+
+                            }}
+                                    
+                            QFrame#MusicFrame-{self.objectName().split('-')[1]}::hover{{
+                                background-color: rgba(55, 55, 55, 86);
+                                border-radius: 10px;
+                            }}
+                        ''')
+                else:
+                    self.setStyleSheet(f'''  
+                            QFrame#MusicFrame-{self.objectName().split('-')[1]}{{
+                                background-color: rgba(70, 70, 70, 86);
+                                border-radius: 10px;
+                            }}
+                                    
+                            QFrame#MusicFrame-{self.objectName().split('-')[1]}::hover{{
+                                background-color: rgba(85, 85, 85, 86);
+                                border-radius: 10px;
+                            }}
+                        ''')
+                    
+                self.toggle = not self.toggle
 
         def play(self) -> None:
             self.main_win.music_session.play()
             self.main_win.music_info_widget.play_button.toggle_pressed()
+            self.main_win.current_music_widget.play_button.toggle_pressed()
 
         def pause(self) -> None:
             self.main_win.music_session.pause()
             self.main_win.music_info_widget.play_button.toggle_pressed()
+            self.main_win.current_music_widget.play_button.toggle_pressed()
         
         def stop(self) -> None:
             self.main_win.music_session.stop()
 
         def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-            self.switch_function()
+            self.switch_function(self)
 
-        def switch_function(self) -> None:
-            self.set_audio()
+        def switch_function(self, widget: QtWidgets.QWidget) -> None:
+            self.set_audio(widget)
             if self.main_win.music_session.isPlaying():
                 self.pause()
             else:
                 self.play()
         
-        def set_audio(self) -> None:
+        def set_audio(self, widget: QtWidgets.QWidget) -> None:
             if not self.main_win.music_session.current_music or self.main_win.music_session.current_music.path != self.music.path:
                 self.stop()
-                self.parent.button.click()
                 time.sleep(0.01)
                 self.main_win.change_current_music_widget_style()
                 self.main_win.music_session.setSource(QtCore.QUrl().fromLocalFile(self.music.path), self)
-                self.main_win.music_info_widget.set_music(self)
-                self.main_win.change_state_like_button()
+                self.main_win.music_info_widget.set_music(self) if not widget == self.main_win.music_info_widget else None
+                self.main_win.current_music_widget.set_music(self) if not widget == self.main_win.current_music_widget else None
+                self.main_win.change_state_like_button(self.main_win.music_info_widget)
+                self.main_win.change_state_like_button(self.main_win.current_music_widget)
                 self.toggle_pressed()
 
         def size_expand(self) -> None:

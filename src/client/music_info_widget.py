@@ -4,6 +4,7 @@ from src.client.side_menu_widget import SideMenu
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.database_models import User, UserPlaylists, Music
 import eyed3
+import settings
 
 
 class MusicInfo(MainPageMenu.MusicFrame):
@@ -48,9 +49,18 @@ class MusicInfo(MainPageMenu.MusicFrame):
             UserPlaylists.create(user_id=self.parent.session.user.id, music_id=self.music.tag.id)
         else:
             UserPlaylists.get((UserPlaylists.user_id==self.parent.session.user.id) & (UserPlaylists.music_id == self.music.tag.id)).delete_instance()
-        
+            self.set_default_track()
+
         self.like_button.toggle_pressed()
+        self.parent.current_music_widget.like_button.toggle_pressed()
         self.parent.my_music_menu.update_music(True)
+    
+    def set_default_track(self) -> None:
+        default_track = MainPageMenu.MusicFrame(self.parent, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
+        self.set_music(default_track)
+        self.parent.music_session.stop()
+        self.setEnabled(False)  
+        self.info_label.hide()
 
     def like_button_clicked(self) -> None:
         if self.parent.session.user.id == -1:
@@ -59,9 +69,10 @@ class MusicInfo(MainPageMenu.MusicFrame):
                                      parent=self.parent)
             return
         self.add_music_to_profile()
+        # self.parent.change_state_like_button(self.parent.current_music_widget)
 
     def play_button_clicked(self) -> None:
-        self.switch_function()
+        self.switch_function(self)
 
     def set_music(self, music_widget: MainPageMenu.MusicFrame) -> None:
         self.play_button.pressed = False
