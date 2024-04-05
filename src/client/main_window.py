@@ -53,7 +53,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         set_style_sheet_for_widget(self, 'main_window.qss')
 
-        # self.main_page_menu.update_music(True)
+        self.main_page_menu.update_music(True)
+
+        self.main_page_menu.update_thread.join()
 
         self.set_user()
 

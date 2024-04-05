@@ -19,7 +19,7 @@ class TypesMenu(enum.Enum):
 class MainPageMenu(AnimatedPanel):
     stop_flag: bool = False
     add_music_signal: QtCore.Signal = QtCore.Signal(AudioFile,)
-    remove_music_signal: QtCore.Signal = QtCore.Signal(QtWidgets.QLayout, QtCore.QObject,)
+    remove_widget_signal: QtCore.Signal = QtCore.Signal(QtWidgets.QLayout, QtCore.QObject,)
     def __init__(self, parent: QtWidgets.QWidget, type: TypesMenu) -> None:
         super(MainPageMenu, self).__init__(parent)
         self.parent = parent
@@ -27,7 +27,7 @@ class MainPageMenu(AnimatedPanel):
         self.__init_ui()
         self.__setting_ui()
         self.add_music_signal.connect(self.load_track)
-        self.remove_music_signal.connect(self.remove_track)
+        self.remove_widget_signal.connect(self.remove_widget)
     
     def __init_ui(self) -> None:
         self.title_label = QtWidgets.QLabel()
@@ -36,6 +36,7 @@ class MainPageMenu(AnimatedPanel):
         self.scroll_layout = QtWidgets.QVBoxLayout()
         self.search_widget = MainPageMenu.SearchWidget(self)
 
+        self.list_musics: list[MainPageMenu.MusicFrame] = []
         self.update_thread: threading.Thread = None
         self.num = 1
 
@@ -103,6 +104,10 @@ class MainPageMenu(AnimatedPanel):
         self.main_v_layout.addItem(QtWidgets.QSpacerItem(0, self.width() // 2 + 40, QtWidgets.QSizePolicy.Policy.Expanding,\
                                                          QtWidgets.QSizePolicy.Policy.Expanding))
         
+    def clear_musics(self) -> None:            
+        for music in self.list_musics:
+            music.close()
+        
     def reload_widget(self, layout: QtWidgets.QVBoxLayout, only_clear: bool=False) -> None: # TODO
         while layout.count(): # Заменить способ удаления или хранения музыки
             item = layout.itemAt(0)
@@ -110,9 +115,9 @@ class MainPageMenu(AnimatedPanel):
             spacer = item.spacerItem()
 
             if widget:
-                self.remove_music_signal.emit(layout, widget)
+                self.remove_widget_signal.emit(layout, widget)
             elif spacer: 
-                self.remove_music_signal.emit(layout, spacer)
+                self.remove_widget_signal.emit(layout, spacer)
 
         if not only_clear:
             self.__init_ui()
@@ -144,9 +149,10 @@ class MainPageMenu(AnimatedPanel):
         ''')
         self.scroll_layout.addWidget(new_music_frame)
         self.num += 1
+        self.list_musics.append(new_music_frame)
 
     @QtCore.Slot(QtWidgets.QLayout, QtCore.QObject,)
-    def remove_track(self, layout: QtWidgets.QLayout, item: QtCore.QObject) -> None:
+    def remove_widget(self, layout: QtWidgets.QLayout, item: QtCore.QObject) -> None:
         layout.removeWidget(item) if isinstance(item, QtWidgets.QWidget) else layout.removeItem(item)
         item.deleteLater() if isinstance(item, QtWidgets.QWidget) else None
         item.close() if isinstance(item, MainPageMenu.MusicFrame) else None
@@ -160,8 +166,8 @@ class MainPageMenu(AnimatedPanel):
     def load_music(self, reload: bool = False) -> None:
         list_musics: list | bool = self.search_widget.search_musics()
         flag = False if list_musics else True
-        if reload:
-            self.reload_widget(self.scroll_layout, True)
+        if reload and self.scroll_layout.count() > 0:
+            self.clear_musics()
         if Music.select().count() == 0:
             fill_database()
         for id in range(1, Music.select().count() + 1) if not self.type \
@@ -184,6 +190,7 @@ class MainPageMenu(AnimatedPanel):
         self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)
     
     class SearchWidget(QtWidgets.QFrame):
+        last_click_time = None
         search_text: str = ''
         def __init__(self, parent: QtWidgets.QWidget) -> None:
             super().__init__(parent)
@@ -224,11 +231,21 @@ class MainPageMenu(AnimatedPanel):
         def set_search_text(self) -> None:
             self.search_text = self.search_line_edit.text()
             if self.search_text == '':
+                current_time = QtCore.QDateTime.currentDateTime()
+                if current_time.secsTo(self.last_click_time) >= -1:
+                    self.last_click_time = current_time
+                    return
                 self.search_button.click()
-        
+                self.last_click_time = current_time
+
         def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+            current_time = QtCore.QDateTime.currentDateTime()
+            if current_time.secsTo(self.last_click_time) >= -1:
+                self.last_click_time = current_time
+                return
             if event.key() == QtCore.Qt.Key.Key_Return.numerator:
                 self.search_button.click()
+            self.last_click_time = current_time
 
         def search_musics(self) -> list | None:
             layout: QtWidgets.QLayout = self.parent.scroll_layout

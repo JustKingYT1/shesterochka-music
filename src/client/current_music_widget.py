@@ -12,6 +12,7 @@ import random
 
 
 class CurrentMusicWidget(AnimatedPanel):
+    unlike_state: bool = False
     music_frame: MainPageMenu.MusicFrame = None
     pixmap: QtGui.QPixmap = None
     def __init__(self, parent: QtWidgets.QWidget) -> None:
@@ -127,9 +128,10 @@ class CurrentMusicWidget(AnimatedPanel):
         self.hide_button.clicked.connect(self.hide_button_clicked)
     
     def on_state_changed(self, state) -> None:
-        if state == MusicSession.PlaybackState.StoppedState:
+        if state == MusicSession.PlaybackState.StoppedState and self.unlike_state:
             self.next_button_clicked()
             self.play_button_clicked()
+            self.unlike_state = True
     
     def set_music(self, music_frame: MainPageMenu.MusicFrame) -> None:
         if music_frame:
@@ -232,6 +234,7 @@ class CurrentMusicWidget(AnimatedPanel):
     def like_button_clicked(self) -> None:
         self.parent.music_info_widget.like_button_clicked()
         if self.like_button.pressed:
+            self.unlike_state = False
             self.hide_button.click()
 
     def hide_button_clicked(self) -> None:
