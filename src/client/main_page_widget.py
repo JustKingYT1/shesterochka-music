@@ -381,6 +381,9 @@ class MainPageMenu(AnimatedPanel):
                 self.main_win.current_music_widget.set_music(self) if not widget == self.main_win.current_music_widget else None
                 self.main_win.change_state_like_button(self.main_win.music_info_widget)
                 self.main_win.change_state_like_button(self.main_win.current_music_widget)
+                self.main_win.current_music_widget.music_session_audio_timer.calculate_timer.start(400)
+                self.main_win.current_music_widget.music_session_audio_timer.update_timer.start(550)
+        
                 self.toggle_pressed()
 
         def size_expand(self) -> None:

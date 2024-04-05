@@ -36,7 +36,7 @@ class CurrentMusicWidget(AnimatedPanel):
         self.image_label = QtWidgets.QLabel()
         self.title_label = QtWidgets.QLabel()
         self.info_label = QtWidgets.QLabel()
-        self.time_slider = QtWidgets.QLabel() # TODO
+        self.music_session_audio_timer = CurrentMusicWidget.MusicSessionAudioTimer(self) 
 
         self.buttons_widget = QtWidgets.QFrame()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -86,8 +86,6 @@ class CurrentMusicWidget(AnimatedPanel):
         self.music_info_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 10))
         self.music_info_layout.addWidget(self.title_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.music_info_layout.addWidget(self.info_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignLeft)
-        self.music_info_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 10))
-        self.music_info_layout.addWidget(self.time_slider, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         
         self.music_info_widget.setLayout(self.music_info_layout)
 
@@ -108,6 +106,8 @@ class CurrentMusicWidget(AnimatedPanel):
 
         self.main_v_layout.addWidget(self.info_widget, 0, QtCore.Qt.AlignmentFlag.AlignTop)
         self.main_v_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignBottom)
+        self.main_v_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 20))
+        self.main_v_layout.addWidget(self.music_session_audio_timer, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_v_layout.addWidget(self.buttons_widget, 2, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.main_v_layout.addWidget(self.tools_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom)
 
@@ -240,5 +240,103 @@ class CurrentMusicWidget(AnimatedPanel):
     def hide_button_clicked(self) -> None:
         self.parent.widget_switch_animation(widget=self)
 
-    class TimeSlider(QtWidgets.QFrame):
-        pass # TODO
+    class MusicSessionAudioTimer(QtWidgets.QFrame):
+        def __init__(self, parent: QtWidgets.QWidget | None = ..., f: QtCore.Qt.WindowType = ...) -> None:
+            super(CurrentMusicWidget.MusicSessionAudioTimer, self).__init__(parent)
+            self.parent = parent
+            self.__init_ui()
+            self.__setting_ui()
+
+        def __init_ui(self) -> None:
+            self.main_h_layout = QtWidgets.QHBoxLayout()
+
+            self.current_time_label = QtWidgets.QLabel('0:00')
+            self.total_time_label = QtWidgets.QLabel('0:00')
+
+            self.slider = CurrentMusicWidget.MusicSessionAudioTimer.Slider(self)
+
+            self.calculate_timer = QtCore.QTimer(self)
+            self.update_timer = QtCore.QTimer(self)
+        
+        def __setting_ui(self) -> None:
+            self.setLayout(self.main_h_layout)
+
+            self.setObjectName('MusicSessionAudioTimer')
+
+            set_style_sheet_for_widget(self, 'music_session_audio_timer.qss')
+
+            self.main_h_layout.addWidget(self.current_time_label)
+            self.main_h_layout.addWidget(self.slider)
+            self.main_h_layout.addWidget(self.total_time_label)
+
+            self.calculate_timer.timeout.connect(self.calculate_time)
+            self.update_timer.timeout.connect(self.update_time)
+
+        def get_new_time_code(self) -> int:
+            return (int(self.total_time.split(':')[0]) * 60 + int(self.total_time.split(':')[1])) / 100 * self.slider.value()
+        
+        def set_new_audio_code(self) -> None:
+            self.parent.music_session.setPosition(int(self.get_new_time_code()) * 1000)
+
+        def get_current_time(self) -> str:
+            return f'{int(self.parent.music_session.position() / 1000 // 60)}:{int(self.parent.music_session.position() / 1000 % 60):02d}'
+        
+        def get_total_time(self) -> str:
+            return f'{int(self.parent.music_session.duration() / 1000 // 60)}:{int(self.parent.music_session.duration() / 1000 % 60):02d}'
+
+        def calculate_time(self) -> None:
+            self.total_time = self.get_total_time()
+            self.current_time = self.get_current_time()
+
+        def update_time(self) -> None:
+            self.total_time_label.setText(self.total_time)
+            self.current_time_label.setText(self.current_time)
+            if not self.slider.mouse_pressed:
+                self.slider.setValue((self.parent.music_session.position() / 1000) / (self.parent.music_session.duration() / 1000) * 100)
+
+        class Slider(QtWidgets.QSlider):
+            current_time_slide: float = 0
+            mouse_pressed: bool = False
+            def __init__(self, parent) -> None:
+                super(CurrentMusicWidget.MusicSessionAudioTimer.Slider, self).__init__(parent)
+                self.parent = parent
+                self.__setting_ui()
+
+            def __setting_ui(self) -> None:
+                self.setObjectName('Slider')
+
+                self.setFixedWidth(self.width() + 140)
+
+                set_style_sheet_for_widget(self, 'slider.qss')
+
+                self.setValue(self.current_time_slide)
+                self.setMinimum(0)
+                self.setMaximum(100)
+                self.setOrientation(QtCore.Qt.Orientation.Horizontal)
+            
+            def get_new_value(self, event) -> None:
+                return self.minimum() + \
+                        (event.x() / self.width()) * \
+                        (self.maximum() - self.minimum())
+
+            def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
+                event.ignore()
+
+            def mousePressEvent(self, event: QtGui.QMouseEvent):
+                self.mouse_pressed = True
+
+                new_value = self.get_new_value(event)
+
+                self.setValue(new_value)
+
+            def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+                if self.mouse_pressed:
+                    new_value = self.get_new_value(event)
+
+                    self.setValue(new_value)
+            
+            def mouseReleaseEvent(self, ev: QtGui.QMouseEvent) -> None:
+                self.mouse_pressed = False
+                self.parent.set_new_audio_code()
+
+
