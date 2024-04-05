@@ -18,6 +18,12 @@ class MusicSession(QtMultimedia.QMediaPlayer):
     def __setting_ui(self) -> None:
         self.setAudioOutput(self.audio_output)
 
+        self.mediaStatusChanged.connect(self.on_media_status_changed)
+
+    def on_media_status_changed(self, status) -> None:
+        if status == QtMultimedia.QMediaPlayer.MediaStatus.EndOfMedia:
+            print(1)
+
     def setSource(self, source: QtCore.QUrl | str, widget: MainPageMenu.MusicFrame) -> None:
         super().setSource(source)
         self.current_music = widget.music

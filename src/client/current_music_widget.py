@@ -128,10 +128,11 @@ class CurrentMusicWidget(AnimatedPanel):
         self.hide_button.clicked.connect(self.hide_button_clicked)
     
     def on_state_changed(self, state) -> None:
-        if state == MusicSession.PlaybackState.StoppedState and self.unlike_state:
+        if state == MusicSession.PlaybackState.StoppedState:
             self.next_button_clicked()
             self.play_button_clicked()
-            self.unlike_state = True
+            if self.unlike_state:
+                self.unlike_state = True
     
     def set_music(self, music_frame: MainPageMenu.MusicFrame) -> None:
         if music_frame:
@@ -176,11 +177,12 @@ class CurrentMusicWidget(AnimatedPanel):
 
     def loop_button_clicked(self) -> None:
         self.loop_button.toggle_pressed()
+
         if not self.loop_button.pressed:
             loop = MusicSession.Loops.Infinite
         else:
             loop = MusicSession.Loops.Once
-
+        
         self.music_session.setLoops(loop)
         
     def refresh_button_clicked(self) -> None:
@@ -338,5 +340,3 @@ class CurrentMusicWidget(AnimatedPanel):
             def mouseReleaseEvent(self, ev: QtGui.QMouseEvent) -> None:
                 self.mouse_pressed = False
                 self.parent.set_new_audio_code()
-
-
