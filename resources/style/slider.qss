@@ -2,12 +2,12 @@ QSlider#Slider::handle:horizontal {
                 width: 5px; /* Ширина ползунка */
                 height: 6px; /* Высота ползунка */
                 margin: -3px 0; /* Выравнивание ползунка */
-                background: white; /* Цвет ползунка */
+                background: rgba(255, 255, 255, 128); /* Цвет ползунка */
                 border-radius: 2px; /* Скругление углов ползунка */
             }
 
 QSlider#Slider::groove:horizontal {
     height: 10px; /* Высота "борозды" ползунка */
-    background: #808080; /* Цвет "борозды" ползунка */
+    background: rgba(65, 65, 65, 128); /* Цвет "борозды" ползунка */
     border-radius: 3px; /* Скругление углов "борозды" ползунка */
 }

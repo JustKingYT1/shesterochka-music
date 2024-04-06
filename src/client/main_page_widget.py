@@ -182,6 +182,8 @@ class MainPageMenu(AnimatedPanel):
                     if title == music.tag.title:
                         flag = True
                         break
+
+            time.sleep(0.01)
                 
             self.add_music_signal.emit(music) if flag else None
             flag = False if list_musics else True
