@@ -1,0 +1,10 @@
+QDialog#TimerDialog>QTimeEdit{
+    background-color: rgba(35, 35, 35, 128);
+    color: white
+}
+
+QDialog#TimerDialog>QTimeEdit::down-button,
+QDialog#TimerDialog>QTimeEdit::up-button{
+    background-color: rgba(35, 35, 35, 128);
+    color: black;
+}

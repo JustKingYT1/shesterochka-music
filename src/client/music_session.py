@@ -9,20 +9,24 @@ class MusicSession(QtMultimedia.QMediaPlayer):
     widget = None
     def __init__(self, parent) -> None:
         super(MusicSession, self).__init__(parent)
+        self.parent = parent
         self.__init_ui()
         self.__setting_ui()
 
     def __init_ui(self) -> None:
         self.audio_output = QtMultimedia.QAudioOutput()
+        self.stop_timer = QtCore.QTimer(self)
 
     def __setting_ui(self) -> None:
         self.setAudioOutput(self.audio_output)
+        self.stop_timer.timeout.connect(self.start_stop_timer)
 
-        self.mediaStatusChanged.connect(self.on_media_status_changed)
-
-    def on_media_status_changed(self, status) -> None:
-        if status == QtMultimedia.QMediaPlayer.MediaStatus.EndOfMedia:
-            print(1)
+    def start_stop_timer(self, seconds: int) -> None:
+        self.stop_timer.singleShot(seconds * 1000, self.stop_timer_slot)
+    
+    def stop_timer_slot(self) -> None:
+        self.stop()
+        self.parent.music_info_widget.music_widget.change_play_buttons_state()
 
     def setSource(self, source: QtCore.QUrl | str, widget: MainPageMenu.MusicFrame) -> None:
         super().setSource(source)

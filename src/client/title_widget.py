@@ -22,7 +22,7 @@ class TitleWidget(QtWidgets.QFrame):
 
     def __setting_ui(self) -> None:
         self.setLayout(self.main_h_layout)
-        self.main_h_layout.setContentsMargins(5,2,5,2.5)
+        self.main_h_layout.setContentsMargins(5, 2, 5, 2)
         self.setObjectName('TitleWidget')
 
         set_style_sheet_for_widget(self, 'title_widget.qss')
@@ -35,6 +35,8 @@ class TitleWidget(QtWidgets.QFrame):
         self.button_layout.addWidget(self.curtail_button)
         self.button_layout.addWidget(self.size_expand_button)
         self.button_layout.addWidget(self.exit_button)
+        
+        # self.button_layout.setContentsMargins(0,0,0,4)
 
         self.main_h_layout.addLayout(self.title_layout)
         self.main_h_layout.addLayout(self.button_layout)
@@ -66,12 +68,13 @@ class TitleWidget(QtWidgets.QFrame):
 
     def set_window_title(self, text: str) -> None:
         self.window_title.setText(text)
+        # self.window_title.setContentsMargins(0, 0, 0, 4)
 
     def set_window_icon(self, title: str) -> None:
         icon = get_pixmap(title)
-        self.window_icon.setFixedSize(QtCore.QSize(20, 20))
+        self.window_icon.setFixedSize(QtCore.QSize(19, 19))
         self.window_icon.setIcon(icon)
-        self.window_icon.setIconSize(QtCore.QSize(20, 20))
+        self.window_icon.setIconSize(QtCore.QSize(19, 19))
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.buttons() == QtCore.Qt.MouseButton.LeftButton:

@@ -34,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.container_layout = QtWidgets.QVBoxLayout()
         self.music_session = MusicSession(self)
         self.title_widget = TitleWidget(self)
-        self.logo_label = QtWidgets.QPushButton()
+        self.logo_label = QtWidgets.QLabel()
         self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
         self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)   
@@ -71,16 +71,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_v_layout.setContentsMargins(0,0,0,0)
         self.container_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.logo_label.setFixedSize(128, 128)
-
         self.container_layout.addSpacing(70)
 
-        self.logo_label.setFixedSize(QtCore.QSize(168, 168))
-
-        pixmap = get_pixmap('logo1')
-
-        self.logo_label.setIcon(pixmap)
-        self.logo_label.setIconSize(QtCore.QSize(168, 168))
+        self.logo_label.setScaledContents(True)
+        self.logo_label.setFixedSize(QtCore.QSize(298, 298))
+        self.logo_label.setPixmap(get_pixmap('logo))'))
 
         self.side_menu.main_page_button.set_widget(self.main_page_menu)
         self.side_menu.my_music_button.set_widget(self.my_music_menu)
@@ -100,13 +95,12 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def show_message(self, text: str, parent=None, error: bool=False):
         message_box = QtWidgets.QMessageBox(parent if parent else self)
+        set_style_sheet_for_widget(message_box, 'message_box.qss')
         message_box.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
         message_box.setIcon(QtWidgets.QMessageBox.Icon.Information if not error else QtWidgets.QMessageBox.Icon.Critical)
         message_box.setText(text)
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-        set_style_sheet_for_widget(message_box, 'message_box.qss')
         message_box.buttons()[0].setFixedSize(60, 20)
-        
         message_box.exec()
     
     def set_user(self) -> None:

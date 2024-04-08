@@ -4,8 +4,8 @@ from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.side_menu_widget import SideMenu
 from src.client.music_session import MusicSession 
 from src.client.main_page_widget import MainPageMenu
+from src.client.dialog_widgets.timer_dialog import TimerDialog
 import io
-import eyed3
 import settings
 import random
 
@@ -58,6 +58,8 @@ class CurrentMusicWidget(AnimatedPanel):
         self.refresh_button = SideMenu.SideButton(self, 'randomize', tool_size)
         self.timer_button = SideMenu.SideButton(self, 'timer', tool_size)
         self.text_button = SideMenu.SideButton(self, 'text', tool_size)
+
+        self.timer_dialog = TimerDialog(self)
     
     def __setting_ui(self) -> None:
         self.setLayout(self.main_v_layout)
@@ -75,6 +77,8 @@ class CurrentMusicWidget(AnimatedPanel):
         self.tools_widget.setObjectName('ToolsWidget')
         self.buttons_widget.setObjectName('ButtonsWidget')
         self.hide_button.setObjectName('HideButton')
+
+        set_style_sheet_for_widget(self, 'current_music_widget.qss')
 
         self.info_layout.addWidget(self.hide_button, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
         self.info_layout.addWidget(self.parent_title, 1, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignTop)
@@ -111,9 +115,7 @@ class CurrentMusicWidget(AnimatedPanel):
         self.main_v_layout.addWidget(self.buttons_widget, 2, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.main_v_layout.addWidget(self.tools_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom)
 
-        set_style_sheet_for_widget(self, 'current_music_widget.qss')
-
-        self.music_session.playbackStateChanged.connect(self.on_state_changed)
+        self.music_session.mediaStatusChanged.connect(self.on_status_changed)
 
         self.unlike_button.clicked.connect(self.unlike_button_clicked)
         self.previous_button.clicked.connect(self.previous_button_clicked)
@@ -127,9 +129,12 @@ class CurrentMusicWidget(AnimatedPanel):
         self.timer_button.clicked.connect(self.timer_button_clicked)
         self.hide_button.clicked.connect(self.hide_button_clicked)
     
-    def on_state_changed(self, state) -> None:
-        if state == MusicSession.PlaybackState.StoppedState:
-            self.next_button_clicked()
+    def on_status_changed(self, status: MusicSession.MediaStatus) -> None:
+        if status == MusicSession.MediaStatus.EndOfMedia:
+            if self.loop_button.pressed:
+                self.next_button_clicked()
+            else:
+                self.music_session.setSource(self.music_session.source(), self.music_frame)
             self.play_button_clicked()
             if self.unlike_state:
                 self.unlike_state = True
@@ -178,13 +183,6 @@ class CurrentMusicWidget(AnimatedPanel):
     def loop_button_clicked(self) -> None:
         self.loop_button.toggle_pressed()
 
-        if not self.loop_button.pressed:
-            loop = MusicSession.Loops.Infinite
-        else:
-            loop = MusicSession.Loops.Once
-        
-        self.music_session.setLoops(loop)
-        
     def refresh_button_clicked(self) -> None:
         self.refresh_button.toggle_pressed()
 
@@ -192,7 +190,9 @@ class CurrentMusicWidget(AnimatedPanel):
         pass # TODO Вряд ли реализую. Подумаю еще
 
     def timer_button_clicked(self) -> None:
-        pass # TODO
+        pos = self.timer_button.mapToGlobal(QtCore.QPoint(-28, -50)) # QtCore.QPoint(11, -12))
+        self.timer_dialog.move_to_new_pos(pos)
+        self.timer_dialog.show()
 
     def unlike_button_clicked(self) -> None:
         pass
@@ -204,6 +204,8 @@ class CurrentMusicWidget(AnimatedPanel):
             id = widget.scroll_layout.count()
         else:
             id = int(self.music_frame.objectName().split("-")[1]) - 1 
+
+        print(id)
 
         new_object_name = f'MusicFrame-{id}'
 

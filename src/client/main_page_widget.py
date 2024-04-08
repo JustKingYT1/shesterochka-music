@@ -352,14 +352,16 @@ class MainPageMenu(AnimatedPanel):
 
         def play(self) -> None:
             self.main_win.music_session.play()
+            self.change_play_buttons_state()
+
+        def change_play_buttons_state(self) -> None:
             self.main_win.music_info_widget.play_button.toggle_pressed()
             self.main_win.current_music_widget.play_button.toggle_pressed()
 
         def pause(self) -> None:
             self.main_win.music_session.pause()
-            self.main_win.music_info_widget.play_button.toggle_pressed()
-            self.main_win.current_music_widget.play_button.toggle_pressed()
-        
+            self.change_play_buttons_state()
+
         def stop(self) -> None:
             self.main_win.music_session.stop()
 
