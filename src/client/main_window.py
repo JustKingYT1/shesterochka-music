@@ -122,8 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.music_info_widget.play_button.setEnabled(True)
             self.music_info_widget.like_button.setEnabled(True)
         if self.music_session.widget:
-            if self.music_session.widget.toggle:
-                self.music_session.widget.toggle_pressed()
+            self.music_session.widget.toggle_pressed()
     
     def change_state_like_button(self, widget: QtWidgets.QWidget) -> None:
         if not widget.like_button.pressed:
