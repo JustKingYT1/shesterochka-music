@@ -26,6 +26,7 @@ class TimerDialog(QtWidgets.QDialog):
         set_style_sheet_for_widget(self, 'timer_dialog.qss')
 
         self.timer_widget.setDisplayFormat('mm:ss')
+        self.timer_widget.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
 
         self.main_h_layout.addWidget(self.timer_widget)
 
@@ -47,6 +48,8 @@ class TimerDialog(QtWidgets.QDialog):
         self.secs = int(time_codes[1])
 
         vremya = self.min * 60 + self.secs
+
+        self.parent.timer_button.pressed = True
 
         self.parent.timer_button.toggle_pressed()
         

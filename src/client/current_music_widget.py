@@ -137,7 +137,8 @@ class CurrentMusicWidget(AnimatedPanel):
             if self.loop_button.pressed:
                 self.next_button_clicked()
             else:
-                self.music_session.setSource(self.music_session.source(), self.music_frame)
+                self.music_frame.set_audio(self.music_frame)
+                self.music_frame.change_play_buttons_state()
             self.play_button_clicked()
             if self.unlike_state:
                 self.unlike_state = True
@@ -193,7 +194,7 @@ class CurrentMusicWidget(AnimatedPanel):
         pass # TODO Вряд ли реализую. Подумаю еще
 
     def timer_button_clicked(self) -> None:
-        pos = self.timer_button.mapToGlobal(QtCore.QPoint(-28, -50)) # QtCore.QPoint(11, -12))
+        pos = self.timer_button.mapToGlobal(QtCore.QPoint(-20, -50)) # QtCore.QPoint(11, -12))
         self.timer_dialog.move_to_new_pos(pos)
         self.timer_dialog.show()
 
