@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.style_setter import set_style_sheet_for_widget
+from src.database_models import NotLikeMusic, Music
 from src.client.side_menu_widget import SideMenu
 from src.client.music_session import MusicSession 
 from src.client.main_page_widget import MainPageMenu
@@ -115,6 +116,8 @@ class CurrentMusicWidget(AnimatedPanel):
         self.main_v_layout.addWidget(self.buttons_widget, 2, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.main_v_layout.addWidget(self.tools_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom)
 
+        self.text_button.setEnabled(False)
+
         self.music_session.mediaStatusChanged.connect(self.on_status_changed)
 
         self.unlike_button.clicked.connect(self.unlike_button_clicked)
@@ -195,7 +198,11 @@ class CurrentMusicWidget(AnimatedPanel):
         self.timer_dialog.show()
 
     def unlike_button_clicked(self) -> None:
-        pass
+        NotLikeMusic.create(music_id=self.music_frame.music.tag.id, user_id=self.parent.session.user.id)
+        self.parent.main_page_menu.update_music(True)
+        self.parent.my_music_menu.update_music(True)
+        self.parent.set_default_track()
+        self.hide_button.click()
 
     def previous_button_clicked(self) -> None:
         widget = self.get_parent_widget()
@@ -204,8 +211,6 @@ class CurrentMusicWidget(AnimatedPanel):
             id = widget.scroll_layout.count()
         else:
             id = int(self.music_frame.objectName().split("-")[1]) - 1 
-
-        print(id)
 
         new_object_name = f'MusicFrame-{id}'
 

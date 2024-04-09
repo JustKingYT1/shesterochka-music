@@ -38,7 +38,7 @@ def get_music_per_id(id: int) -> eyed3.AudioFile:
         file.tag.artist = 'Неизвестен' if not file.tag.artist else file.tag.artist
         file.tag.save()
 
-    file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist))
+    file.tag.id = Music.get((Music.title==file.tag.title) & (Music.artist==file.tag.artist)).id
 
     return file
 

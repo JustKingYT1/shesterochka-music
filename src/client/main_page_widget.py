@@ -4,7 +4,7 @@ from src.client.tools.music_tools import get_music_per_id, fill_database
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.tools.pixmap_tools import get_pixmap
 from src.client.animated_panel_widget import AnimatedPanel
-from src.database_models import Music, UserPlaylists
+from src.database_models import Music, UserPlaylists, NotLikeMusic
 from io import BytesIO
 import settings
 import time
@@ -164,8 +164,10 @@ class MainPageMenu(AnimatedPanel):
         self.update_thread.start()
 
     def load_music(self, reload: bool = False) -> None:
-        list_musics: list | bool = self.search_widget.search_musics()
-        flag = False if list_musics else True
+        list_search_musics: list | bool = self.search_widget.search_musics()
+        list_unliked_music: list = NotLikeMusic.select().where(NotLikeMusic.user_id == self.parent.session.user.id)
+        flag = False if list_search_musics else True
+        print(list_unliked_music)
         if reload and self.scroll_layout.count() > 0:
             self.clear_musics()
         if Music.select().count() == 0:
@@ -177,16 +179,21 @@ class MainPageMenu(AnimatedPanel):
 
             music: AudioFile = get_music_per_id(id)
 
-            if list_musics and len(list_musics) > 0:
-                for title in list_musics:
+            if list_search_musics and len(list_search_musics) > 0:
+                for title in list_search_musics:
                     if title == music.tag.title:
                         flag = True
                         break
 
+            if list_unliked_music and len(list_unliked_music) > 0:
+                for elem in list_unliked_music:
+                    if elem.music_id.id == music.tag.id:
+                        flag = False
+                        break
+
             time.sleep(0.01)
-                
             self.add_music_signal.emit(music) if flag else None
-            flag = False if list_musics else True
+            flag = False if list_search_musics else True
 
     def size_expand(self) -> None:
         self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)

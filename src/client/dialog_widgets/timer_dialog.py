@@ -48,6 +48,8 @@ class TimerDialog(QtWidgets.QDialog):
 
         vremya = self.min * 60 + self.secs
 
+        self.parent.timer_button.toggle_pressed()
+        
         self.timer.start(900)
 
         self.parent.music_session.start_stop_timer(vremya)

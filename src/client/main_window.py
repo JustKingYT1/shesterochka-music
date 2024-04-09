@@ -53,11 +53,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
         set_style_sheet_for_widget(self, 'main_window.qss')
 
-        self.main_page_menu.update_music(True)
-
-        self.main_page_menu.update_thread.join()
-
         self.set_user()
+
+        if self.main_page_menu.scroll_layout.count() == 0:
+            self.main_page_menu.update_music(True)
 
         self.title_widget.set_window_title('Shesterocka Music')
         self.title_widget.set_window_icon('logo')
@@ -102,6 +101,13 @@ class MainWindow(QtWidgets.QMainWindow):
         message_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         message_box.buttons()[0].setFixedSize(60, 20)
         message_box.exec()
+
+    def set_default_track(self) -> None:
+        default_track = MainPageMenu.MusicFrame(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
+        self.music_info_widget.set_music(default_track)
+        self.music_session.stop()
+        self.music_info_widget.setEnabled(False)  
+        self.music_info_widget.info_label.hide()
     
     def set_user(self) -> None:
         config = ConfigManager.get_config()

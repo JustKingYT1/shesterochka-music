@@ -34,7 +34,7 @@ class Music(BaseModel):
         indexes = ((('title', 'artist'), True),)
 
 
-class NotLikeMusic(Music):
+class NotLikeMusic(BaseModel):
     user_id = peewee.ForeignKeyField(User, backref='NotLikeMusic', null=False)
     music_id = peewee.ForeignKeyField(Music, backref='NotLikeMusic', null=False)
 
