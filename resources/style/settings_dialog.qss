@@ -1,0 +1,17 @@
+QFrame#SettingsDialog{
+    background-color: rgb(50, 50, 50);
+    border-radius: 3px;
+}
+
+QToolButton{
+    background-color: rgb(50, 50, 50);
+    border-radius: 3px;
+}
+
+QToolButton::hover{
+    background-color: rgb(70, 70, 70);
+}
+
+QToolButton::pressed{
+    background-color: rgb(55, 55, 55);
+}

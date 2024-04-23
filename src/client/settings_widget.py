@@ -4,8 +4,8 @@ from src.client.tools.pixmap_tools import get_pixmap
 from src.client.tools.style_setter import set_style_sheet_for_widget
 from src.client.dialog_widgets.register_dialog_widget import RegisterDialog
 from src.client.dialog_widgets.login_dialog_widget import LoginDialog
-import settings
-import eyed3
+from src.client.dialog_widgets.settings_dialog import SettingsDialog
+from src.client.side_menu_widget import SideMenu
 
 
 class SettingsMenu(AnimatedPanel):
@@ -19,12 +19,13 @@ class SettingsMenu(AnimatedPanel):
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_widget = QtWidgets.QWidget()
         self.scroll_layout = QtWidgets.QVBoxLayout()
-        self.exit_button = QtWidgets.QToolButton()
+        self.setting_dialog_button = SideMenu.SideButton(self, 'settings', QtCore.QSize(19, 19))
         self.authorize_v_layout = QtWidgets.QVBoxLayout()
         self.user_profile_layout = QtWidgets.QVBoxLayout()
         self.register_dialog = RegisterDialog(self.parent)
         self.login_dialog = LoginDialog(self.parent)
         self.spacer = QtWidgets.QSpacerItem(0, 100)
+        self.settings_dialog = SettingsDialog(self)
         self.user_nickname_label = QtWidgets.QLabel('Гость')
         self.user_image_label = QtWidgets.QLabel('Пользователь')
         self.log_in_button = QtWidgets.QPushButton('Войти')
@@ -58,19 +59,17 @@ class SettingsMenu(AnimatedPanel):
         self.user_image_label.setFixedSize(128, 128)
         self.user_image_label.setPixmap(get_pixmap('user_undefined.png'))
 
-        self.exit_button.setFixedSize(24, 24)
+        self.setting_dialog_button.setFixedSize(24, 24)
 
         self.register_label.setOpenExternalLinks(False)
         self.register_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextBrowserInteraction)
 
         self.register_label.linkActivated.connect(self.register_label_clicked)
-        self.exit_button.clicked.connect(self.exit_button_clicked)
+        self.setting_dialog_button.clicked.connect(self.settings_dialog_button_clicked)
         self.log_in_button.clicked.connect(self.login_button_clicked)
-        self.exit_button.hide()
+        self.setting_dialog_button.hide()
 
-        self.exit_button.setIcon(get_pixmap('cancel.png'))
-
-        self.scroll_layout.addWidget(self.exit_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
+        self.scroll_layout.addWidget(self.setting_dialog_button, 0, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight)
 
         self.user_profile_layout.addWidget(self.user_image_label, 0)
         
@@ -104,7 +103,7 @@ class SettingsMenu(AnimatedPanel):
         self.user_nickname_label.setText(self.parent.session.user.nickname)
         self.log_in_button.hide()
         self.register_label.hide()
-        self.exit_button.show()
+        self.setting_dialog_button.show()
         self.main_v_layout.addSpacerItem(self.spacer)
 
         self.parent.main_page_menu.update_music(True)
@@ -113,15 +112,17 @@ class SettingsMenu(AnimatedPanel):
 
         self.size_expand()
 
-    def exit_button_clicked(self) -> None:
-        self.exit_account()
+    def settings_dialog_button_clicked(self) -> None:
+        self.setting_dialog_button.toggle_pressed()
+        self.settings_dialog.toggle_widget()
+        self.settings_dialog.raise_()
 
     def exit_account(self) -> None:
         self.parent.session.leave()
         self.user_nickname_label.setText(self.parent.session.user.nickname)
         self.log_in_button.show()
         self.register_label.show()
-        self.exit_button.hide()
+        self.setting_dialog_button.hide()
         self.main_v_layout.removeItem(self.spacer)
 
         self.parent.main_page_menu.update_music(True)
