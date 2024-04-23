@@ -29,11 +29,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
     
     def __init_ui(self) -> None:
+        self.title_widget = TitleWidget(self)
         self.central_widget = RoundedCornersWindow()
         self.main_v_layout = QtWidgets.QVBoxLayout()
+        self.sub_main_v_layout = QtWidgets.QVBoxLayout()
+        self.container_widget = QtWidgets.QWidget()
         self.container_layout = QtWidgets.QVBoxLayout()
         self.music_session = MusicSession(self)
-        self.title_widget = TitleWidget(self)
         self.logo_label = QtWidgets.QLabel()
         self.side_menu = SideMenu(self)
         self.settings_menu = SettingsMenu(self)
@@ -63,12 +65,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.central_widget.setLayout(self.main_v_layout)
         self.session.set_parent(self)
+        self.container_widget.setLayout(self.container_layout)
 
-        self.main_v_layout.addWidget(self.title_widget) 
-        self.main_v_layout.addLayout(self.container_layout)
+        self.main_v_layout.addWidget(self.title_widget)
+        self.main_v_layout.addLayout(self.sub_main_v_layout)
+
+        self.sub_main_v_layout.addWidget(self.container_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom)
+        self.sub_main_v_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
 
         self.main_v_layout.setContentsMargins(0,0,0,0)
-        self.container_layout.setContentsMargins(10, 10, 10, 10)
+        self.sub_main_v_layout.setContentsMargins(10,10,10,10)
+        self.container_layout.setContentsMargins(0, 0, 0, 0)
 
         self.container_layout.addSpacing(70)
 
@@ -86,7 +93,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.container_layout.addWidget(self.logo_label, 0, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.container_layout.addWidget(self.music_info_widget, 1, QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.container_layout.addWidget(self.side_menu, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
 
         self.music_info_widget.mousePressEvent = self.musicInfoMousePressEvent
 
@@ -148,6 +154,11 @@ class MainWindow(QtWidgets.QMainWindow):
         widget.start_animation()
         widget.raise_()
         self.opened_widget = widget
+        blur_effect = QtWidgets.QGraphicsBlurEffect(self.container_layout)
+        blur_effect.setBlurRadius(7)
+        blur_effect.setBlurHints(QtWidgets.QGraphicsBlurEffect.BlurHint.QualityHint)
+        self.container_widget.setGraphicsEffect(blur_effect) if self.opened_widget.is_opened else self.container_widget.setGraphicsEffect(None)
+
 
     def on_timer_finished(self, widget) -> None:
         self.start_widget_animation(widget)

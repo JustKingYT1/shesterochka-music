@@ -199,6 +199,11 @@ class CurrentMusicWidget(AnimatedPanel):
         self.timer_dialog.show()
 
     def unlike_button_clicked(self) -> None:
+        if self.parent.session.user.id == -1:
+            self.parent.show_message(text='Войдите в аккаунт для возможности\nдобавлять музыку в избранное', 
+                                     error=True,
+                                     parent=self.parent)
+            return
         NotLikeMusic.create(music_id=self.music_frame.music.tag.id, user_id=self.parent.session.user.id)
         self.parent.main_page_menu.update_music(True)
         self.parent.my_music_menu.update_music(True)
