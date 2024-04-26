@@ -13,8 +13,9 @@ import threading
   
 
 class TypesMenu(enum.Enum):
-    MyMusic: bool = True
-    MainMusic: bool = False
+    MyMusic: bool = 1
+    MainMusic: bool = 0
+    DeletedMusic: bool = 2
 
 class MainPageMenu(AnimatedPanel):
     stop_flag: bool = False
@@ -48,12 +49,19 @@ class MainPageMenu(AnimatedPanel):
         self.setContentsMargins(-6, 30, -10, 20)
 
         set_style_sheet_for_widget(self, 'main_page_menu.qss')
-        if self.parent.session.user.id == -1 and self.type is True:
+        if self.parent.session.user.id == -1 and self.type == TypesMenu.MyMusic.value:
             self.set_notification('Авторизуйтесь для использования своей музыки')
             self.search_widget.hide()
             return
         
-        self.title_label.setText('<h2>Главная</h2>' if not self.type else '<h2>Моя музыка</h2>')
+        if self.type == TypesMenu.MainMusic.value:
+            title = '<h2>Главная</h2>'
+        elif self.type == TypesMenu.MyMusic.value:
+            title = '<h2>Моя музыка</h2>'
+        elif self.type == TypesMenu.DeletedMusic.value:
+            title = '<h2>Удаленная музыка</h2>'
+
+        self.title_label.setText(title)
 
         self.title_label.setObjectName('TitleLabel')
 
@@ -162,18 +170,25 @@ class MainPageMenu(AnimatedPanel):
             self.update_thread.join()
         self.update_thread = threading.Thread(target=self.load_music, args=[reload,])
         self.update_thread.start()
+    
+    def get_list_musics_id(self) -> list[int]:
+        if self.type == TypesMenu.MainMusic.value:
+            return range(1, Music.select().count() + 1)
+        elif self.type == TypesMenu.MyMusic.value:
+            return [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]
+        elif self.type == TypesMenu.DeletedMusic.value:
+            return [elem.music_id for elem in NotLikeMusic.select().where(NotLikeMusic.user_id == self.parent.session.user.id)]
 
     def load_music(self, reload: bool = False) -> None:
         list_search_musics: list | bool = self.search_widget.search_musics()
         list_unliked_music: list = NotLikeMusic.select().where(NotLikeMusic.user_id == self.parent.session.user.id)
         flag = False if list_search_musics else True
-        print(list_unliked_music)
         if reload and self.scroll_layout.count() > 0:
             self.clear_musics()
         if Music.select().count() == 0:
             fill_database()
-        for id in range(1, Music.select().count() + 1) if not self.type \
-            else [elem.music_id for elem in UserPlaylists.select().where(UserPlaylists.user_id == self.parent.session.user.id)]:
+        
+        for id in self.get_list_musics_id():
             if self.stop_flag:
                 exit()
 
@@ -185,7 +200,7 @@ class MainPageMenu(AnimatedPanel):
                         flag = True
                         break
 
-            if list_unliked_music and len(list_unliked_music) > 0:
+            if list_unliked_music and len(list_unliked_music) > 0 and self.type != TypesMenu.DeletedMusic.value:
                 for elem in list_unliked_music:
                     if elem.music_id.id == music.tag.id:
                         flag = False
@@ -199,7 +214,7 @@ class MainPageMenu(AnimatedPanel):
         self.resize(self.parent.width() - 13.5, self.parent.height() - 72.5)
     
     class SearchWidget(QtWidgets.QFrame):
-        last_click_time = None
+        last_click_time = QtCore.QDateTime.currentDateTime()
         search_text: str = ''
         def __init__(self, parent: QtWidgets.QWidget) -> None:
             super().__init__(parent)
@@ -374,6 +389,7 @@ class MainPageMenu(AnimatedPanel):
 
         def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
             self.switch_function(self)
+            self.main_win.widget_switch_animation(widget=self.main_win.opened_widget)
 
         def switch_function(self, widget: QtWidgets.QWidget) -> None:
             self.set_audio(widget)
@@ -388,8 +404,8 @@ class MainPageMenu(AnimatedPanel):
                 time.sleep(0.01)
                 self.main_win.change_current_music_widget_style()
                 self.main_win.music_session.setSource(QtCore.QUrl().fromLocalFile(self.music.path), self)
-                self.main_win.music_info_widget.set_music(self) if not widget == self.main_win.music_info_widget else None
-                self.main_win.current_music_widget.set_music(self) if not widget == self.main_win.current_music_widget else None
+                self.main_win.music_info_widget.set_music(self) if not widget == self.main_win.music_info_widget.music_frame else None
+                self.main_win.current_music_widget.set_music(self) if not widget == self.main_win.current_music_widget.music_frame else None
                 self.main_win.change_state_like_button(self.main_win.music_info_widget)
                 self.main_win.change_state_like_button(self.main_win.current_music_widget)
                 self.main_win.current_music_widget.music_session_audio_timer.calculate_timer.start(400)

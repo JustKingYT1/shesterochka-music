@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.animated_panel_widget import AnimatedPanel
 from src.client.tools.style_setter import set_style_sheet_for_widget
-from src.database_models import NotLikeMusic, Music
+from src.database_models import NotLikeMusic
 from src.client.side_menu_widget import SideMenu
 from src.client.music_session import MusicSession 
 from src.client.main_page_widget import MainPageMenu
@@ -147,6 +147,13 @@ class CurrentMusicWidget(AnimatedPanel):
         if music_frame:
             self.music_frame = music_frame
             music = music_frame.music
+            check_for_del = NotLikeMusic.get_or_none((NotLikeMusic.user_id == self.parent.session.user.id) & (NotLikeMusic.music_id == music_frame.music.tag.id))
+            if check_for_del:
+                self.unlike_button.pressed = True
+                self.unlike_button.toggle_pressed()
+            else:
+                self.unlike_button.pressed = False
+                self.unlike_button.toggle_pressed()
             self.title_label.setText(music.tag.title)
             self.info_label.setText(f'{music.tag.artist} • {music.tag.album}')
             if music.tag.images:
@@ -197,18 +204,32 @@ class CurrentMusicWidget(AnimatedPanel):
         pos = self.timer_button.mapToGlobal(QtCore.QPoint(-20, -50)) # QtCore.QPoint(11, -12))
         self.timer_dialog.move_to_new_pos(pos)
         self.timer_dialog.show()
-
-    def unlike_button_clicked(self) -> None:
-        if self.parent.session.user.id == -1:
-            self.parent.show_message(text='Войдите в аккаунт для возможности\nдобавлять музыку в избранное', 
-                                     error=True,
-                                     parent=self.parent)
-            return
+    
+    def add_to_unlike_list(self) -> None:
         NotLikeMusic.create(music_id=self.music_frame.music.tag.id, user_id=self.parent.session.user.id)
         self.parent.main_page_menu.update_music(True)
         self.parent.my_music_menu.update_music(True)
         self.parent.set_default_track()
+        self.parent.deleted_music_menu.update_music(True)
         self.hide_button.click()
+    
+    def remove_on_unlike_list(self) -> None:
+        NotLikeMusic.get((NotLikeMusic.user_id == self.parent.session.user.id) & (NotLikeMusic.music_id == self.music_frame.music.tag.id)).delete_instance()
+        self.parent.main_page_menu.update_music(True)
+        self.parent.my_music_menu.update_music(True)
+        self.parent.deleted_music_menu.update_music(True)
+
+    def unlike_button_clicked(self) -> None:
+        if self.parent.session.user.id == -1:
+            self.parent.show_message(text='Войдите в аккаунт для возможности\nубирать музыку из глобального списка', 
+                                     error=True,
+                                     parent=self.parent)
+            return
+        self.unlike_button.toggle_pressed()
+        if not self.unlike_button.pressed:
+            self.add_to_unlike_list()
+        else:
+            self.remove_on_unlike_list()
 
     def previous_button_clicked(self) -> None:
         widget = self.get_parent_widget()

@@ -45,7 +45,7 @@ class MusicSession(QtMultimedia.QMediaPlayer):
         self.stop()
         self.stop_timer.stop()
         self.parent.current_music_widget.timer_button.toggle_pressed()
-        self.parent.music_info_widget.music_widget.change_play_buttons_state()
+        self.parent.music_info_widget.music_frame.change_play_buttons_state()
 
     def setSource(self, source: QtCore.QUrl | str, widget: MainPageMenu.MusicFrame) -> None:
         super().setSource(source)

@@ -41,6 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_menu = SettingsMenu(self)
         self.main_page_menu = MainPageMenu(self, TypesMenu.MainMusic)   
         self.my_music_menu = MainPageMenu(self, TypesMenu.MyMusic)
+        self.deleted_music_menu = MainPageMenu(self, TypesMenu.DeletedMusic)
         self.music_info_widget = MusicInfo(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.current_music_widget = CurrentMusicWidget(self)
         self.timer = QtCore.QTimer(self)
@@ -111,9 +112,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def set_default_track(self) -> None:
         default_track = MainPageMenu.MusicFrame(self, eyed3.load(f'{settings.MUSIC_DIR}/empty.mp3'))
         self.music_info_widget.set_music(default_track)
+        # self.current_music_widget.set_music(default_track)
         self.music_session.stop()
         self.music_info_widget.setEnabled(False)  
         self.music_info_widget.info_label.hide()
+        self.music_info_widget.like_button.pressed = False
+        self.music_info_widget.like_button.toggle_pressed()
     
     def set_user(self) -> None:
         config = ConfigManager.get_config()

@@ -8,7 +8,7 @@ import settings
 
 
 class MusicInfo(MainPageMenu.MusicFrame):
-    music_widget: MainPageMenu.MusicFrame
+    music_frame: MainPageMenu.MusicFrame = None
     def __init__(self, parent: QtWidgets.QWidget, music: eyed3.AudioFile) -> None:
         super(MusicInfo, self).__init__(parent, music)
         self.parent = parent
@@ -77,5 +77,5 @@ class MusicInfo(MainPageMenu.MusicFrame):
         self.info_label.setText(f'{music_widget.music.tag.artist} • {music_widget.music.tag.album}')
         self.info_label.show()
         self.image_label.setPixmap(music_widget.pixmap)
-        self.music_widget = music_widget
+        self.music_frame = music_widget
         self.music = music_widget.music
